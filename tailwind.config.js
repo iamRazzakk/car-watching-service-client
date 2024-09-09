@@ -1,16 +1,18 @@
-/** @type {import('tailwindcss').Config} */
+import { nextui } from "@nextui-org/react";
+
+
 export default {
   content: [
-    "./index.html",
-    "./src/**/*.{js,ts,jsx,tsx}",
+    './index.html',
+    './src/**/*.{js,ts,jsx,tsx}',
   ],
   theme: {
     extend: {
-      fontFamily:{
-        "Josefin":["Josefin Sans", "sans-serif"]
-      }
+      fontFamily: {
+        "Josefin": ['Josefin Sans', 'sans-serif'],
+      },
     },
   },
-  plugins: [],
+  darkMode: 'class',
+  plugins: [nextui()],
 }
-

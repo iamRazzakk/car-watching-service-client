@@ -1,11 +1,13 @@
+import { RouterProvider } from "react-router-dom"
+import { userRouter } from "./hooks/useRoutes"
 
 
 
 function App() {
-
+const router = userRouter()
   return (
     <>
-      <h1 className="text-2xl font-bold font-Josefin">Hello world</h1>
+      <RouterProvider  router={router}/>
     </>
   )
 }
