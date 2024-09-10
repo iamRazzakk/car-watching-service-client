@@ -1,5 +1,6 @@
 import { FaEnvelope, FaLock } from "react-icons/fa";
 import Button from "../../shared/Button/Button";
+import { Link } from "react-router-dom";
 
 const SingInForm = () => {
   return (
@@ -48,7 +49,16 @@ const SingInForm = () => {
             text="Sing In"
             category="secondary"
             className="w-full mx-auto"
-          ></Button>
+          />
+          {/* Register Link */}
+          <div className="mt-4 text-center">
+            <p className="text-gray-600">
+              Don't have an account?{" "}
+              <Link to="/auth/singup" className="text-primary font-semibold">
+                Register
+              </Link>
+            </p>
+          </div>
         </form>
       </div>
     </div>

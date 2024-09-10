@@ -1,5 +1,6 @@
 import { FaUser, FaLock, FaEnvelope } from "react-icons/fa";
 import Button from "../../shared/Button/Button";
+import { Link } from "react-router-dom";
 
 const SignupForm = () => {
   return (
@@ -60,7 +61,16 @@ const SignupForm = () => {
             text="Sing up"
             category="primary"
             className="w-full mx-auto"
-          ></Button>
+          />
+          {/* Login Link */}
+        <div className="mt-4 text-center">
+          <p className="text-gray-600">
+            Already have an account?{' '}
+            <Link to="/auth/login" className="text-primary font-semibold">
+              Login
+            </Link>
+          </p>
+        </div>
         </form>
       </div>
     </div>
