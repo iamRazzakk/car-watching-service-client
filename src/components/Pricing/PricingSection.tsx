@@ -1,3 +1,4 @@
+import Title from "../../shared/Title/Title";
 import PricingSectionCard from "./PricingSectionCard";
 
 const PricingSection = () => {
@@ -28,16 +29,19 @@ const PricingSection = () => {
     },
   ];
   return (
-    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 p-6">
-      {services.map((service) => (
-        <PricingSectionCard
-          key={service.id}
-          serviceName={service.serviceName}
-          description={service.description}
-          price={service.price}
-          duration={service.duration}
-        />
-      ))}
+    <div>
+      <Title text="Pricing Plans" level={1} className="text-xl title" />
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 p-6">
+        {services.map((service) => (
+          <PricingSectionCard
+            key={service.id}
+            serviceName={service.serviceName}
+            description={service.description}
+            price={service.price}
+            duration={service.duration}
+          />
+        ))}
+      </div>
     </div>
   );
 };
