@@ -56,30 +56,30 @@ const HeroSection = () => {
         nextArrow={customNextArrow}
         pauseOnHover={false}
       >
-        {images.map((each, index) => (
-          <div key={index} className="relative w-full">
+        {images.map((each, idx) => (
+          <div key={idx} className="relative w-full">
             <img
               className="w-full h-[80vh] md:h-[70vh] lg:h-[90vh] object-cover rounded"
               src={each}
-              alt={`slide-${index}`}
+              alt={`slide-${idx}`}
             />
             {/* Title, Description, and Buttons for each slide */}
             <div className="absolute top-0 left-0 w-full h-full flex flex-col items-center justify-center text-center text-white z-20 bg-black bg-opacity-40">
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4">
-                {slidesInfo[index].title}
+                {slidesInfo[idx].title}
               </h1>
               <p className="text-lg md:text-xl lg:text-2xl max-w-2xl mb-6">
-                {slidesInfo[index].description}
+                {slidesInfo[idx].description}
               </p>
               <div className="space-x-4">
               <div className="space-x-4">
                 <Button
-                  text={slidesInfo[index].button1Text}
+                  text={slidesInfo[idx].button1Text}
                   type="primary"
                   onClick={() => handleButtonClick('Primary')}
                 />
                 <Button
-                  text={slidesInfo[index].button2Text}
+                  text={slidesInfo[idx].button2Text}
                   type="secondary"
                   onClick={() => handleButtonClick('Secondary')}
                 />
