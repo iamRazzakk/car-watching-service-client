@@ -6,28 +6,40 @@ const PricingSection = () => {
     {
       id: 1,
       serviceName: "Basic Wash",
-      description:
-        "A quick exterior wash and rinse to remove dirt and grime. Perfect for a regular refresh.",
       price: "$20",
-      duration: "30 minutes",
+
+      subcategories: [
+        { id: 1, name: "Exterior Wash" },
+        { id: 2, name: "Interior Cleaning" },
+        { id: 3, name: "Tire Shine" },
+      ],
     },
     {
       id: 2,
       serviceName: "Premium Wash",
-      description:
-        "An enhanced wash including exterior hand wash, wax application, and tire shine. Ideal for a more detailed clean.",
       price: "$40",
-      duration: "1 hour",
+
+      subcategories: [
+        { id: 1, name: "Hand Wash" },
+        { id: 2, name: "Wax Application" },
+        { id: 3, name: "Tire Cleaning" },
+        { id: 4, name: "Windows Clean" },
+      ],
     },
     {
       id: 3,
       serviceName: "Ultimate Detail",
-      description:
-        "Our most comprehensive service with exterior wash, interior detailing, wax treatment, and interior vacuuming. For the ultimate clean and shine.",
       price: "$70",
-      duration: "1.5 hours",
+
+      subcategories: [
+        { id: 1, name: "Exterior Wash" },
+        { id: 2, name: "Interior Detailing" },
+        { id: 3, name: "Engine Detailing" },
+        { id: 4, name: "Clay Bar Treatment" },
+      ],
     },
   ];
+
   return (
     <div>
       <Title text="Pricing Plans" level={1} className="text-xl title" />
@@ -36,9 +48,8 @@ const PricingSection = () => {
           <PricingSectionCard
             key={service.id}
             serviceName={service.serviceName}
-            description={service.description}
             price={service.price}
-            duration={service.duration}
+            subcategories={service.subcategories}
           />
         ))}
       </div>

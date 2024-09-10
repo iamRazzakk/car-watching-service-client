@@ -75,12 +75,13 @@ const HeroSection = () => {
               <div className="space-x-4">
               <Button
                   text={slidesInfo[idx].button1Text}
-                  type="primary"
+                  category="primary"
                   onClick={() => handleButtonClick("Primary")}
                 />
                 <Button
                   text={slidesInfo[idx].button2Text}
-                  type="secondary"
+                  type="primary"
+                  className="bg-white text-black"
                   onClick={() => handleButtonClick("Secondary")}
                 />
               </div>
