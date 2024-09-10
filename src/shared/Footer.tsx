@@ -1,4 +1,5 @@
 import Button from "./Button/Button";
+import Title from "./Title/Title";
 
 const Footer = () => {
   const handleButtonClick = (buttonType: string) => {
@@ -8,12 +9,10 @@ const Footer = () => {
     <>
       <footer className="mt-20 xl:mt-32 mx-auto w-full relative text-center bg-[#517DE9] text-white">
         <div className="px-6 py-8 md:py-14 xl:pt-20 xl:pb-12 space-y-4">
-          <h2 className="font-bold text-3xl xl:text-4xl leading-snug">
-            Ready to get your productivity back?
-            <br />
-            Start your free trial today.
-          </h2>
-          <Button text="Get Started" type="secondary" onClick={() => handleButtonClick("Secondary")} />
+          <Title text="Providing top-notch car wash services with the best products and professionals in the industry." key={2}  className="font-bold text-2xl xl:text-4xl leading-snug text-white w-1/2 mx-auto">
+          
+          </Title>
+          <Button text="Get Started" category="secondary" onClick={() => handleButtonClick("secondary")} />
           <div className="mt-14 xl:mt-20">
             <nav className="flex flex-wrap justify-center text-lg font-medium">
               <div className="px-5 py-2">

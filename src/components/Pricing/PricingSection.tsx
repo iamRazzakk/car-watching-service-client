@@ -41,7 +41,7 @@ const PricingSection = () => {
   ];
 
   return (
-    <div>
+    <div className="lg:mt-8 md:mt-6 mt-4">
       <Title text="Pricing Plans" level={1} className="text-xl title" />
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 p-6">
         {services.map((service) => (

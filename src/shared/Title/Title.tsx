@@ -8,7 +8,7 @@ const Title: React.FC<TitleProps> = ({ text, level = 2, className = "" }) => {
   const HeadingTag = `h${level}` as keyof JSX.IntrinsicElements;
 
   return (
-    <HeadingTag className={`text-gray-900 font-bold ${className}`}>
+    <HeadingTag className={` ${className}`}>
       {text}
     </HeadingTag>
   );

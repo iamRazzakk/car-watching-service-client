@@ -30,9 +30,13 @@ const PricingSectionCard: React.FC<PricingSectionCardProps> = ({
   return (
     <div className="flex flex-col p-4 border border-gray-200 rounded-lg shadow-md bg-white w-full mx-auto max-w-sm md:max-w-md lg:max-w-lg h-full">
       <div className="flex-1">
-        <h3 className="text-lg font-semibold text-center md:text-xl">{serviceName}</h3>
+        <h3 className="text-lg font-semibold text-center md:text-xl">
+          {serviceName}
+        </h3>
         <div className="mt-2 flex justify-center items-center">
-          <span className="text-blue-500 font-bold text-lg md:text-xl">{price}</span>
+          <span className="text-blue-500 font-bold text-lg md:text-xl">
+            {price}
+          </span>
         </div>
         <div className="mt-4 ">
           {subcategories.length > 0 && (
@@ -53,7 +57,7 @@ const PricingSectionCard: React.FC<PricingSectionCardProps> = ({
       <div className="mt-4 text-center">
         <Button
           onClick={() => handleButtonClick(serviceName)}
-          text="Book Now"
+          text="Choose Plan"
           category="primary"
           className="py-2 px-4 text-base md:text-lg"
         />
