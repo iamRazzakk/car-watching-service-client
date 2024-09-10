@@ -5,7 +5,7 @@ import img2 from "../../assets/img2.jpg";
 import img3 from "../../assets/img3.jpg";
 import { GrFormPrevious } from "react-icons/gr";
 import { GrFormNext } from "react-icons/gr";
-import Button from "../Button/Button";
+import Button from "../../shared/Button/Button";
 
 const HeroSection = () => {
   const images = [img1, img2, img3];
@@ -73,15 +73,15 @@ const HeroSection = () => {
               </p>
               <div className="space-x-4">
               <div className="space-x-4">
-                <Button
+              <Button
                   text={slidesInfo[idx].button1Text}
                   type="primary"
-                  onClick={() => handleButtonClick('Primary')}
+                  onClick={() => handleButtonClick("Primary")}
                 />
                 <Button
                   text={slidesInfo[idx].button2Text}
                   type="secondary"
-                  onClick={() => handleButtonClick('Secondary')}
+                  onClick={() => handleButtonClick("Secondary")}
                 />
               </div>
               </div>
