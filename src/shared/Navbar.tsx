@@ -55,7 +55,7 @@ const Navbar = () => {
             </li>
             <li>
               <NavLink
-                to="/login"
+                to="/auth/login"
                 className={({ isActive }) =>
                   `hover:text-black ${isActive ? "font-bold text-black" : "text-white font-bold"}`
                 }

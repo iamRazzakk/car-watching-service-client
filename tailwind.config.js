@@ -9,6 +9,9 @@ export default {
       fontFamily: {
         Josefin: ['Josefin Sans', 'sans-serif'],
       },
+      colors: {
+        primary: '#517de9',
+      },
     },
   },
   plugins: [],

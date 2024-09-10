@@ -1,4 +1,5 @@
-import { ButtonProps } from "@nextui-org/react";
+import { ButtonProps } from "../../types/Button";
+
 
 const Button: React.FC<ButtonProps> = ({
   text,
