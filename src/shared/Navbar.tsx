@@ -3,7 +3,7 @@ import { NavLink } from "react-router-dom";
 
 const Navbar = () => {
   return (
-    <nav className="border bg-[#517de9] text-white">
+    <nav className="border bg-[#517de9] text-white px-5">
       <div className="p-4 flex items-center justify-between ">
         {/* Logo */}
         <div className="flex items-center">
