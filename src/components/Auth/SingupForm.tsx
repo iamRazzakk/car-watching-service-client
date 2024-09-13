@@ -13,7 +13,7 @@ interface FormErrors {
 }
 
 const SignupForm = () => {
-  const [createUser, { isLoading, error }] = useCreateUserMutation();
+  const [createUser, { isLoading }] = useCreateUserMutation();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: "",
