@@ -3,6 +3,7 @@ import MainLayouts from "../layouts/MainLayouts"
 import { MainRoutes } from "../routes/main.routes"
 import { AuthRouter } from "../routes/auth.routes"
 import AuthLayout from "../layouts/AuthLayout"
+import ErrorPage from "../pages/ErrorPage/ErrorPage"
 
 export const userRouter = ()=>{
     return createBrowserRouter([
@@ -10,13 +11,13 @@ export const userRouter = ()=>{
             path:'/',
             element:<MainLayouts />,
             children: MainRoutes,
-            errorElement:<h1 className="text-5xl font-bold text-center">ERROR</h1>
+            errorElement:<ErrorPage />
         },
         {
             path:'/auth',
             element:<AuthLayout />,
             children:AuthRouter,
-            errorElement:<h1 className="text-5xl font-bold text-center">ERROR</h1>
+            errorElement:<ErrorPage />
         }
     ])
 }

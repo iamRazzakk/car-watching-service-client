@@ -5,7 +5,8 @@ const Button: React.FC<ButtonProps> = ({
   text,
   category,
   onClick,
-  className = '', 
+  className = '',
+  type = 'button',
 }) => {
   const buttonStyles = category === 'primary'
     ? 'bg-blue-600 hover:bg-blue-700 text-white'
@@ -23,6 +24,7 @@ const Button: React.FC<ButtonProps> = ({
     <button
       className={`px-6 py-3 rounded-lg ${buttonStyles} relative overflow-hidden group ${className}`}
       onClick={onClick}
+      type={type} // Add this line
     >
       <span className={`relative z-10 transition-colors duration-300 ease-out ${hoverTextColor}`}>
         {text}

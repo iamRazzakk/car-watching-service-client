@@ -1,4 +1,4 @@
-export type CInput = {
+export type CInputType = {
   
   name: string;
   placeholder?: string;

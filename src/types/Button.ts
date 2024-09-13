@@ -3,4 +3,6 @@ export type ButtonProps = {
     category: 'primary' | 'secondary';
     onClick?: () => void;
     className?: string;
+    type?: 'button' | 'submit' | 'reset';
+    disabled?:boolean |"disabled"
   }
