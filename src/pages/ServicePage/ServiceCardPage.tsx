@@ -13,7 +13,7 @@ const ServiceCardPage = ({ service }: { service: TCreateService }) => {
   return (
     <div className="flex flex-col bg-white shadow-lg rounded-lg lg:h-[450px]">
       <img
-        src={"https://i.ibb.co/com/QkBv1Kf/javascript-functions.png"}
+        src=""
         alt="Service Image"
         className="w-full h-48 object-cover rounded-t-lg"
       />

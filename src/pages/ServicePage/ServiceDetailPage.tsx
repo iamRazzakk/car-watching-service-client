@@ -1,9 +1,10 @@
 import React from "react";
 import { useParams } from "react-router-dom";
-import { useGetCarServiceByIdQuery } from "../../redux/features/services/serviceApi";
+import { useGetCarServiceByIdQuery } from "../../redux/Api/services/serviceApi";
 import LoadingPage from "../Loading/LoadingPage";
 import { FaDollarSign, FaClock } from "react-icons/fa";
 import Button from "../../shared/Button/Button";
+import NavigationButtons from "../../shared/NavigationButtons/NavigationButtons";
 
 const ServiceDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -18,8 +19,9 @@ const ServiceDetailPage: React.FC = () => {
 
   return (
     <div className="container mx-auto p-4 lg:p-8">
+      <NavigationButtons  />
       {service ? (
-        <div className="flex flex-col lg:flex-row bg-white shadow-lg rounded-lg overflow-hidden">
+        <div className="flex flex-col lg:flex-row bg-white shadow-lg rounded-lg overflow-hidden lg:mt-8 md:mt-4">
           {/* Image Section */}
           <div className="w-full lg:w-1/2">
             <img

@@ -1,5 +1,5 @@
 import { useSelector, useDispatch } from "react-redux";
-import { NavLink } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import logo from "../assets/logo.png";
 import { logOut } from "../redux/features/auth/authslice";
 import { RootState } from "../redux/store";
@@ -18,7 +18,9 @@ const Navbar = () => {
     <nav className="border bg-[#517de9] text-white px-5">
       <div className="p-4 flex items-center justify-between">
         <div className="flex items-center">
-          <img className="w-10 h-8 object-cover" src={logo} alt="Logo" />
+          <Link to="/">
+            <img className="w-10 h-8 object-cover" src={logo} alt="Logo" />
+          </Link>
         </div>
         <div className="flex items-center space-x-4">
           <ul className="flex space-x-4">

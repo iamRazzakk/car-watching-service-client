@@ -1,4 +1,4 @@
-import { baseApi } from "../../Api/baseApi";
+import { baseApi } from "../baseApi";
 
 const serviceApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
@@ -15,7 +15,10 @@ const serviceApi = baseApi.injectEndpoints({
     }),
 
     getAllCarServices: builder.query({
-      query: () => "/services",
+      query: () => ({
+        url: "/services", 
+        method: "GET", 
+      }),
     }),
 
     updateCarService: builder.mutation({

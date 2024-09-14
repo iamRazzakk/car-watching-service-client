@@ -1,6 +1,12 @@
 import Title from "../../shared/Title/Title";
 import OurServiceCard from "./OurServiceCard";
 import '../../css/Heading.css'
+export type TOurService={
+  id:number,
+  name:string,
+  description:string,
+  icon:string
+}
 const OurService = () => {
   const services = [
     {
@@ -51,8 +57,8 @@ const OurService = () => {
   return (
     <div className="lg:mt-8 md:mt-6 mt-4">
         <Title text="Our Services" level={1} className="text-xl title" />
-      <div className="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {services?.map((service) => (
+      <div className="lg:p-6 md:p-4 p-3 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {services?.map((service:TOurService) => (
           <OurServiceCard key={service.id} service={service} />
         ))}
       </div>
