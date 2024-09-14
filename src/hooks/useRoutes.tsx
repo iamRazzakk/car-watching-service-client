@@ -18,6 +18,11 @@ export const userRouter = ()=>{
             element:<AuthLayout />,
             children:AuthRouter,
             errorElement:<ErrorPage />
+        },
+        
+        {
+            path:"*",
+            element:<ErrorPage />
         }
     ])
 }
