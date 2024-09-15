@@ -6,8 +6,13 @@ import DashboardServices from './services/DashboardServices';
 const { Header, Content,  Sider } = Layout;
 const items = [
   {
-    name: 'Create A. Semester',
+    name: 'Service Management',
     path: 'services',
+    element: <DashboardServices />,
+  },
+  {
+    name: 'Home',
+    path: '/',
     element: <DashboardServices />,
   },
 ]

@@ -8,17 +8,23 @@ const serviceApi = baseApi.injectEndpoints({
         url: "/services",
         body: serviceData,
       }),
+      // Invalidate the list tag when creating a new service
+      invalidatesTags: [{ type: "Service", id: "LIST" }],
     }),
 
     getCarServiceById: builder.query({
       query: (id) => `/services/${id}`,
+      // Provides a tag for this specific service
+      providesTags: (result, error, id) => [{ type: "Service", id }],
     }),
 
     getAllCarServices: builder.query({
       query: () => ({
-        url: "/services", 
-        method: "GET", 
+        url: "/services",
+        method: "GET",
       }),
+      // Provides a tag for the list of services
+      providesTags: [{ type: "Service", id: "LIST" }],
     }),
 
     updateCarService: builder.mutation({
@@ -27,6 +33,10 @@ const serviceApi = baseApi.injectEndpoints({
         url: `/services/${id}`,
         body: serviceData,
       }),
+      invalidatesTags: (result, error, { id }) => [
+        { type: "Service", id },
+        { type: "Service", id: "LIST" },
+      ],
     }),
 
     deleteCarService: builder.mutation({
@@ -34,6 +44,8 @@ const serviceApi = baseApi.injectEndpoints({
         method: "DELETE",
         url: `/services/${id}`,
       }),
+      // Invalidate the list tag when deleting a service
+      invalidatesTags: [{ type: "Service", id: "LIST" }],
     }),
   }),
 });
@@ -45,4 +57,5 @@ export const {
   useUpdateCarServiceMutation,
   useDeleteCarServiceMutation,
 } = serviceApi;
+
 export default serviceApi;
