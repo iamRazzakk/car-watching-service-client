@@ -1,7 +1,11 @@
-import React from "react";
-import { Button, Table, Tooltip, Space, Modal } from "antd";
+import { useState } from "react";
+import { Button, Table, Tooltip, Space, Modal, Form } from "antd";
 import type { TableProps } from "antd";
-import { useDeleteCarServiceMutation, useGetAllCarServicesQuery } from "../../../redux/Api/services/serviceApi";
+import {
+  useDeleteCarServiceMutation,
+  useGetAllCarServicesQuery,
+  useUpdateCarServiceMutation,
+} from "../../../redux/Api/services/serviceApi";
 import LoadingPage from "../../../pages/Loading/LoadingPage";
 import { toast } from "sonner";
 
@@ -15,8 +19,12 @@ interface DataType {
 }
 
 const DashboardServices: React.FC = () => {
-  const { data, isLoading,refetch } = useGetAllCarServicesQuery();
+  const { data, isLoading } = useGetAllCarServicesQuery();
   const [deleteCarService] = useDeleteCarServiceMutation();
+  const [updateCarService] = useUpdateCarServiceMutation();
+  const [modalVisible, setModalVisible] = useState(false);
+  const [currentRecord, setCurrentRecord] = useState<DataType | null>(null);
+  const [form] = Form.useForm();
 
   // Handle loading state
   if (isLoading) return <LoadingPage />;
@@ -33,9 +41,9 @@ const DashboardServices: React.FC = () => {
         try {
           await deleteCarService(id).unwrap();
           toast.success("Service deleted successfully");
-          refetch();
         } catch (error) {
-            const errorMessage = error instanceof Error ? error.message : "Failed to delete service";
+          const errorMessage =
+            error instanceof Error ? error.message : "Failed to delete service";
           toast.error(errorMessage);
         }
       },
@@ -43,9 +51,31 @@ const DashboardServices: React.FC = () => {
   };
 
   // Handle edit action
-  const handleEdit = (id: string) => {
-   
-    console.log("Edit", id);
+  const handleEdit = (record: DataType) => {
+    setCurrentRecord(record);
+    form.setFieldsValue({
+      name: record.name,
+      duration: record.duration,
+      price: record.price,
+      description: record.description,
+    });
+    setModalVisible(true);
+  };
+
+  // Handle form submission
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const handleSubmit = async (values: any) => {
+    if (currentRecord) {
+      try {
+        await updateCarService({ id: currentRecord.key, ...values }).unwrap();
+        toast.success("Service updated successfully");
+        setModalVisible(false);
+      } catch (error) {
+        const errorMessage =
+          error instanceof Error ? error.message : "Failed to update service";
+        toast.error(errorMessage);
+      }
+    }
   };
 
   // Define table columns
@@ -69,7 +99,9 @@ const DashboardServices: React.FC = () => {
       render: (text) => (
         <Tooltip title={text}>
           <p className="description-text">
-            {text.length > 50 ? `${text.slice(0, 50)}...` : text}
+            {text.toString().length > 50
+              ? `${text.toString().slice(0, 50)}...`
+              : text}
           </p>
         </Tooltip>
       ),
@@ -90,10 +122,14 @@ const DashboardServices: React.FC = () => {
       key: "action",
       render: (_, record) => (
         <Space size="middle">
-          <Button type="primary" onClick={() => handleEdit(record.key)}>
+          <Button type="primary" onClick={() => handleEdit(record)}>
             Edit
           </Button>
-          <Button type="primary" danger onClick={() => handleDelete(record.key)}>
+          <Button
+            type="primary"
+            danger
+            onClick={() => handleDelete(record.key)}
+          >
             Delete
           </Button>
         </Space>
@@ -101,22 +137,78 @@ const DashboardServices: React.FC = () => {
     },
   ];
 
+  // Transform fetched data to fit DataType format
   const myData: DataType[] =
-  data?.data
-    .filter((item: any) => !item.isDeleted) 
-    .map((item: any) => ({
-      key: item._id,
-      name: item.name,
-      duration: item.duration,
-      price: item.price,
-      description: item.description,
-      createdAt: item.createdAt,
-    })) || [];
+    data?.data
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .filter((item: any) => !item.isDeleted)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .map((item: any) => ({
+        key: item._id,
+        name: item.name,
+        duration: item.duration,
+        price: item.price,
+        description: item.description,
+        createdAt: item.createdAt,
+      })) || [];
 
   return (
     <div>
       <h2 className="lg:text-4xl font-bold text-center">All Services</h2>
-      <Table columns={columns} dataSource={myData} />
+      <Table
+        columns={columns}
+        dataSource={myData}
+        pagination={{ pageSize: 10 }}
+        scroll={{ x: "max-content" }}
+      />
+
+      {/* Edit Modal */}
+      <Modal
+        title="Edit Service"
+        visible={modalVisible}
+        onCancel={() => setModalVisible(false)}
+        footer={null}
+      >
+        <Form form={form} layout="vertical" onFinish={handleSubmit}>
+          <Form.Item
+            label="Name"
+            name="name"
+            rules={[
+              { required: true, message: "Please enter the service name!" },
+            ]}
+          >
+            <input className="border lg:px-3 py-2 rounded-md border-blue-600" type="text" />
+          </Form.Item>
+          <Form.Item
+            label="Duration (min)"
+            name="duration"
+            rules={[{ required: true, message: "Please enter the duration!" }]}
+          >
+            <input type="number" className="border lg:px-3 py-2 rounded-md border-blue-600" />
+          </Form.Item>
+          <Form.Item
+            label="Price ($)"
+            name="price"
+            rules={[{ required: true, message: "Please enter the price!" }]}
+          >
+            <input type="number" className="border lg:px-3 py-2 rounded-md border-blue-600" />
+          </Form.Item>
+          <Form.Item
+            label="Description"
+            name="description"
+            rules={[
+              { required: true, message: "Please enter the description!" },
+            ]}
+          >
+            <textarea className="border lg:px-3 py-2 rounded-md border-blue-600" style={{ height: 120, resize: 'none' }} />
+          </Form.Item>
+          <Form.Item>
+            <Button type="primary" htmlType="submit">
+              Save
+            </Button>
+          </Form.Item>
+        </Form>
+      </Modal>
     </div>
   );
 };
