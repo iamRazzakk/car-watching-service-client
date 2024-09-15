@@ -21,7 +21,7 @@ const SignupForm = () => {
     password: "",
     phone: "",
     address: "",
-    role: "USER",
+    // role: "USER",
   });
   // State to manage form field errors
   const [formErrors, setFormErrors] = useState<FormErrors>({});
@@ -75,7 +75,7 @@ const SignupForm = () => {
               placeholder="Enter your email"
               value={formData.email}
               onChange={handleChange}
-              error={formErrors.email} // Pass the error message
+              error={formErrors.email} 
             />
           </div>
           <div className="flex flex-col">

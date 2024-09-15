@@ -6,14 +6,13 @@ import { toast } from "sonner";
 import ILabel from "../Form/ILabel";
 import CInput from "../Form/CInput";
 import { useSingInUserMutation } from "../../redux/features/auth/authApi";
-import { useDispatch } from "react-redux";
 import { setUser } from "../../redux/features/auth/authslice";
-
+import { useAppDispatch } from "../../redux/hooks";
 
 const SingInForm = () => {
   const [signInUser, { isLoading }] = useSingInUserMutation();
   const navigate = useNavigate();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -26,18 +25,19 @@ const SingInForm = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await signInUser(formData).unwrap();
-      if (response.success) {
-        localStorage.setItem("accessToke", response.accessToke);
-        localStorage.setItem("refreshToke", response.refreshToke);
-
+      const res = await signInUser(formData).unwrap();
+      console.log(res);
+      const user = res.data;
+      const token = res.accessToke;
+      const userData = { user, token };
+      if (res.success) {
         // Dispatch the setUser action with correct payload
-        dispatch(setUser({ user: response.user, token: response.accessToke }));
+        dispatch(setUser( userData ));
 
         toast.success("User logged in successfully!");
         navigate("/");
       } else {
-        toast.error(response.message || "Sign in failed.");
+        toast.error(res.message || "Sign in failed.");
       }
     } catch (error) {
       toast.error(`Failed to sign in: ${error.message as string}`);
@@ -105,7 +105,7 @@ const SingInForm = () => {
           <div className="mt-4 text-center">
             <p className="text-gray-600">
               Don't have an account?{" "}
-              <Link to="/auth/signup" className="text-primary font-semibold">
+              <Link to="/auth/singup" className="text-primary font-semibold">
                 Register
               </Link>
             </p>

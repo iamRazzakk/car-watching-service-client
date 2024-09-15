@@ -1,17 +1,15 @@
-import { useSelector, useDispatch } from "react-redux";
+import { useDispatch } from "react-redux";
 import { Link, NavLink } from "react-router-dom";
 import logo from "../assets/logo.png";
-import { logOut } from "../redux/features/auth/authslice";
-import { RootState } from "../redux/store";
+import { logOut, useCurrentUser } from "../redux/features/auth/authslice";
+import { useAppSelector } from "../redux/hooks";
 
 const Navbar = () => {
   const dispatch = useDispatch();
-  const { user, token } = useSelector((state: RootState) => state?.auth);
-  console.log(user);
+  const user = useAppSelector(useCurrentUser);
+  // console.log(user);
   const handleLogout = () => {
     dispatch(logOut());
-    localStorage.removeItem("accessToke");
-    localStorage.removeItem("refreshToke");
   };
 
   return (
@@ -60,7 +58,7 @@ const Navbar = () => {
                 Contact Us
               </NavLink>
             </li>
-            {token ? (
+            {user ? (
               <>
                 <li>
                   <NavLink

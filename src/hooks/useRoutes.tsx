@@ -4,6 +4,7 @@ import { MainRoutes } from "../routes/main.routes"
 import { AuthRouter } from "../routes/auth.routes"
 import AuthLayout from "../layouts/AuthLayout"
 import ErrorPage from "../pages/ErrorPage/ErrorPage"
+import DashBoardLayout from "../layouts/DashBoardLayout"
 
 export const userRouter = ()=>{
     return createBrowserRouter([
@@ -18,6 +19,11 @@ export const userRouter = ()=>{
             element:<AuthLayout />,
             children:AuthRouter,
             errorElement:<ErrorPage />
+        },
+        {
+            path:"/dashboard",
+            element:<DashBoardLayout />,
+            
         },
         
         {
