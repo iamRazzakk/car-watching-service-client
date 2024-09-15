@@ -154,7 +154,7 @@ const DashboardServices: React.FC = () => {
 
   return (
     <div>
-      <h2 className="lg:text-4xl font-bold text-center">All Services</h2>
+      <h2 className="lg:text-4xl md:text-2xl text-xl font-bold text-center">All Services</h2>
       <Table
         columns={columns}
         dataSource={myData}

@@ -1,29 +1,48 @@
+// src/layouts/Dashboard.tsx
 import React from 'react';
 import { Layout, Menu, theme } from 'antd';
-import {  NavLink, Outlet } from 'react-router-dom';
-import DashboardServices from './services/DashboardServices';
+import { NavLink, Outlet } from 'react-router-dom';
+import {
+  UserOutlined,
+  ScheduleOutlined,
+  AppstoreAddOutlined,
+  AppstoreOutlined,
+} from '@ant-design/icons';
 
-const { Header, Content,  Sider } = Layout;
-const items = [
+const { Header, Content, Sider } = Layout;
+
+// Define the menu items with sub-navigation
+const menuItems = [
   {
-    name: 'Service Management',
-    path: 'services',
-    element: <DashboardServices />,
+    key: 'services',
+    icon: <AppstoreOutlined />,
+    label: <NavLink to="services">Service Management</NavLink>,
   },
   {
-    name: 'Home',
-    path: '/',
-    element: <DashboardServices />,
+    key: 'slot',
+    icon: <ScheduleOutlined />,
+    label: 'Slot Management',
+    children: [
+      {
+        key: 'slot-create',
+        icon: <AppstoreAddOutlined />,
+        label: <NavLink to="slot/create">Create Slot</NavLink>,
+      },
+      {
+        key: 'slot-view',
+        icon: <AppstoreAddOutlined />,
+        label: <NavLink to="slot/view">View Slots</NavLink>,
+      },
+    ],
   },
-]
-const dashBoardRouteGenerator = items?.map(
-  (item, index) => ({
-    key: String(index + 1),
-    label: <NavLink to={`${item.path}`}>{item.name}</NavLink>,
-  }),
-);
+  {
+    key: 'home',
+    icon: <UserOutlined />,
+    label: <NavLink to="/">Home</NavLink>,
+  },
+];
 
-const App: React.FC = () => {
+const Dashboard: React.FC = () => {
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
@@ -41,7 +60,12 @@ const App: React.FC = () => {
         }}
       >
         <div className="demo-logo-vertical" />
-        <Menu theme="dark" mode="inline" defaultSelectedKeys={['4']} items={dashBoardRouteGenerator} />
+        <Menu
+          theme="dark"
+          mode="inline"
+          defaultSelectedKeys={['home']}
+          items={menuItems}
+        />
       </Sider>
       <Layout>
         <Header style={{ padding: 0, background: colorBgContainer }} />
@@ -63,4 +87,4 @@ const App: React.FC = () => {
   );
 };
 
-export default App;
+export default Dashboard;
