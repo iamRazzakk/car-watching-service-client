@@ -1,29 +1,30 @@
-import {
-  UploadOutlined,
-  UserOutlined,
-  VideoCameraOutlined,
-} from "@ant-design/icons";
-import { Layout, Menu, theme } from "antd";
-import React from "react";
+import React from 'react';
+import { Layout, Menu, theme } from 'antd';
+import {  NavLink, Outlet } from 'react-router-dom';
+import DashboardServices from './services/DashboardServices';
 
-const { Header, Content, Footer, Sider } = Layout;
-
+const { Header, Content,  Sider } = Layout;
 const items = [
-  UserOutlined,
-  VideoCameraOutlined,
-  UploadOutlined,
-  UserOutlined,
-].map((icon, index) => ({
-  key: String(index + 1),
-  icon: React.createElement(icon),
-  label: `nav ${index + 1}`,
-}));
-const Dashboard = () => {
+  {
+    name: 'Create A. Semester',
+    path: 'services',
+    element: <DashboardServices />,
+  },
+]
+const dashBoardRouteGenerator = items?.map(
+  (item, index) => ({
+    key: String(index + 1),
+    label: <NavLink to={`${item.path}`}>{item.name}</NavLink>,
+  }),
+);
+
+const App: React.FC = () => {
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
+
   return (
-    <Layout>
+    <Layout style={{ minHeight: '100vh' }}>
       <Sider
         breakpoint="lg"
         collapsedWidth="0"
@@ -35,33 +36,26 @@ const Dashboard = () => {
         }}
       >
         <div className="demo-logo-vertical" />
-        <Menu
-          theme="dark"
-          mode="inline"
-          defaultSelectedKeys={["4"]}
-          items={items}
-        />
+        <Menu theme="dark" mode="inline" defaultSelectedKeys={['4']} items={dashBoardRouteGenerator} />
       </Sider>
       <Layout>
         <Header style={{ padding: 0, background: colorBgContainer }} />
-        <Content style={{ margin: "24px 16px 0" }}>
+        <Content style={{ margin: '24px 16px 0' }}>
           <div
             style={{
               padding: 24,
-              minHeight: 360,
+              minHeight: '100vh',
               background: colorBgContainer,
               borderRadius: borderRadiusLG,
+              boxSizing: 'border-box',
             }}
           >
-            content
+            <Outlet />
           </div>
         </Content>
-        <Footer style={{ textAlign: "center" }}>
-          Ant Design ©{new Date().getFullYear()} Created by Ant UED
-        </Footer>
       </Layout>
     </Layout>
   );
 };
 
-export default Dashboard;
+export default App;
