@@ -1,41 +1,49 @@
+import React from "react";
 import { Form, Button, DatePicker, TimePicker, Select } from "antd";
-import {
-  useCreateSlotMutation,
-  useGetAllSlotsQuery,
-} from "../../../redux/Api/slot/slotApi";
+import { useCreateSlotMutation } from "../../../redux/Api/slot/slotApi";
 import { toast } from "sonner";
 import LoadingPage from "../../../pages/Loading/LoadingPage";
+import { useGetAllCarServicesQuery } from "../../../redux/Api/services/serviceApi";
 
 const { Option } = Select;
 
 const CreateSlot: React.FC = () => {
   const [createSlot, { isLoading }] = useCreateSlotMutation();
-  const {
-    data,
-    isLoading: slotsLoading,
-  } = useGetAllSlotsQuery();
+  const { data, isLoading: servicesLoading } = useGetAllCarServicesQuery();
   const [form] = Form.useForm();
 
-  // Extract slots data
-  const slots = data?.data || [];
+  // Extract services data
+  const services = data?.data || [];
 
   const onFinish = async (values: any) => {
     try {
+      // Extract values
+      const { service, date, startTime, endTime } = values;
+
+      // Validate end time is after start time
+      if (endTime.isBefore(startTime)) {
+        toast.error("End time must be after start time");
+        return;
+      }
+
+      // Call API
       await createSlot({
-        service: values.service,
-        date: values.date.format("YYYY-MM-DD"),
-        startTime: values.startTime.format("HH:mm"),
-        endTime: values.endTime.format("HH:mm"),
+        service,
+        date: date.format("YYYY-MM-DD"),
+        startTime: startTime.format("HH:mm"),
+        endTime: endTime.format("HH:mm"),
       }).unwrap();
+      
       toast.success("Slot created successfully");
       form.resetFields();
-    } catch (error) {
-        const errorMessage = error?.response?.data?.message || error.message || 'An unexpected error occurred';
-        toast.error(errorMessage);
+    } catch (error: any) {
+      // Handle error
+      const errorMessage = error?.data?.message || error.message || 'An unexpected error occurred';
+      toast.error(errorMessage);
     }
   };
 
-  if (slotsLoading) return <LoadingPage />;
+  if (servicesLoading) return <LoadingPage />;
 
   return (
     <>
@@ -51,15 +59,13 @@ const CreateSlot: React.FC = () => {
           label="Service ID"
           rules={[{ required: true, message: "Please select a service" }]}
         >
-          <div className="w-full">
-            <Select className="w-full" placeholder="Select a service">
-              {slots.map((slot: any) => (
-                <Option key={slot._id} value={slot.service._id}>
-                  {slot.service.name}
-                </Option>
-              ))}
-            </Select>
-          </div>
+          <Select className="w-full" placeholder="Select a service">
+            {services.map((service: any) => (
+              <Option key={service._id} value={service._id}>
+                {service.name}
+              </Option>
+            ))}
+          </Select>
         </Form.Item>
 
         <Form.Item
@@ -67,9 +73,7 @@ const CreateSlot: React.FC = () => {
           label="Date"
           rules={[{ required: true, message: "Please select a date" }]}
         >
-          <div className="w-full">
-            <DatePicker className="w-full" format="YYYY-MM-DD" />
-          </div>
+          <DatePicker className="w-full" format="YYYY-MM-DD" />
         </Form.Item>
 
         <Form.Item
@@ -77,9 +81,7 @@ const CreateSlot: React.FC = () => {
           label="Start Time"
           rules={[{ required: true, message: "Please select a start time" }]}
         >
-          <div className="w-full">
-            <TimePicker className="w-full" format="HH:mm" />
-          </div>
+          <TimePicker className="w-full" format="HH:mm" />
         </Form.Item>
 
         <Form.Item
@@ -87,9 +89,7 @@ const CreateSlot: React.FC = () => {
           label="End Time"
           rules={[{ required: true, message: "Please select an end time" }]}
         >
-          <div className="w-full">
-            <TimePicker className="w-full" format="HH:mm" />
-          </div>
+          <TimePicker className="w-full" format="HH:mm" />
         </Form.Item>
 
         <Form.Item>
