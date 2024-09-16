@@ -35,6 +35,24 @@ const menuItems = [
       },
     ],
   },
+   // Correct user management section
+   {
+    key: 'user',
+    icon: <UserOutlined />,
+    label: 'User Management',
+    children: [
+      {
+        key: 'user-create',
+        icon: <UserOutlined />,
+        label: <NavLink to="user/create">Create User</NavLink>,
+      },
+      {
+        key: 'user-view',
+        icon: <UserOutlined />,
+        label: <NavLink to="user/view">View Users</NavLink>,
+      },
+    ],
+  },
   {
     key: 'home',
     icon: <UserOutlined />,

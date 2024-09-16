@@ -22,4 +22,18 @@ export const dashboardRouter = [
       },
     ],
   },
+  {
+    path: 'user',
+    element: <div><Outlet /></div>,
+    children: [
+      {
+        path: 'create',
+        element:  <h1>create user</h1>,
+      },
+      {
+        path: 'view',
+        element: <h1>view user</h1>,
+      },
+    ],
+  },
 ];
