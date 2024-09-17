@@ -19,8 +19,15 @@ const authApi = baseApi.injectEndpoints({
     getAllUsers: builder.query({
       query: () => "auth/users",
     }),
+    userUpdateRole: builder.mutation({
+      query:({role, userId})=>({
+        method: "PATCH",
+        url: `auth/users/${userId}/role`,
+        body: { role },
+      })
+    })
   }),
 });
 
-export const { useCreateUserMutation, useSingInUserMutation, useGetAllUsersQuery } = authApi;
+export const { useCreateUserMutation, useSingInUserMutation, useGetAllUsersQuery, useUserUpdateRoleMutation } = authApi;
 export default authApi;

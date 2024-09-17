@@ -1,23 +1,23 @@
-import { Table,  Select, Space } from 'antd';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { Table, Select, Space } from 'antd';
 import { useState } from 'react';
-import { useGetAllUsersQuery } from '../../../redux/features/auth/authApi';
+import { useGetAllUsersQuery, useUserUpdateRoleMutation } from '../../../redux/features/auth/authApi';
 
 const { Option } = Select;
 
 const UserManagement = () => {
   const { data, refetch } = useGetAllUsersQuery();
-  const [selectedRole, setSelectedRole] = useState({});
+  const [updateUserRole] = useUserUpdateRoleMutation();
+  const [selectedRole, setSelectedRole] = useState<{ [key: string]: string }>({});
 
   // Handle role change for a specific user
-  const handleRoleChange = (userId: string, role: string) => {
-    setSelectedRole((prev) => ({ ...prev, [userId]: role }));
-  };
-
-  // Handle updating the role
-  const handleUpdateRole = async (userId: string) => {
-    if (selectedRole[userId]) {
-      await updateUserRole({ userId, role: selectedRole[userId] });
+  const handleRoleChange = async (userId: string, newRole: string) => {
+    setSelectedRole((prev) => ({ ...prev, [userId]: newRole }));
+    try {
+      await updateUserRole({ userId, role: newRole }).unwrap();
       refetch(); // Refetch user data after role update
+    } catch (error) {
+      console.error('Failed to update role:', error);
     }
   };
 
@@ -38,9 +38,16 @@ const UserManagement = () => {
       title: 'Role',
       dataIndex: 'role',
       key: 'role',
-      render: (role: string) => (
-        <span className='border border-blue-600 px-3 py-1 rounded-lg'>{role}</span> 
-      ),
+      render: (role: string) => {
+        // Conditionally set class based on the role
+        const roleClass =
+          role === 'ADMIN'
+            ? 'border border-green-600 text-green-600'
+            : 'border border-blue-600 text-blue-600';
+        return (
+          <span className={`px-3 py-1 rounded-lg ${roleClass}`}>{role}</span>
+        );
+      },
     },
     {
       title: 'Actions',
@@ -49,7 +56,7 @@ const UserManagement = () => {
         <Space>
           {/* Conditionally render dropdown based on the current role */}
           <Select
-            defaultValue={record.role === 'ADMIN' ? 'ADMIN' : 'USER'}
+            value={selectedRole[record._id] || record.role}
             style={{ width: 120 }}
             onChange={(newRole) => handleRoleChange(record._id, newRole)}
           >
