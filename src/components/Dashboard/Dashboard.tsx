@@ -47,9 +47,9 @@ const menuItems = [
         label: <NavLink to="user/create">Create User</NavLink>,
       },
       {
-        key: 'user-view',
+        key: 'update-role',
         icon: <UserOutlined />,
-        label: <NavLink to="user/view">View Users</NavLink>,
+        label: <NavLink to="user/role">User Role Update</NavLink>,
       },
     ],
   },

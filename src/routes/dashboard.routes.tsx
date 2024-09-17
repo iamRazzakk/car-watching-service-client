@@ -2,6 +2,7 @@ import DashboardServices from '../components/Dashboard/services/DashboardService
 import CreateSlot from '../components/Dashboard/Slot/CreateSlot';
 import { Outlet } from 'react-router-dom';
 import ViewAllSlote from '../components/Dashboard/Slot/ViewAllSlote';
+import UserManagement from '../components/Dashboard/userManagement/UserManagement';
 
 export const dashboardRouter = [
   {
@@ -31,8 +32,8 @@ export const dashboardRouter = [
         element:  <h1>create user</h1>,
       },
       {
-        path: 'view',
-        element: <h1>view user</h1>,
+        path: 'role',
+        element: <UserManagement />,
       },
     ],
   },

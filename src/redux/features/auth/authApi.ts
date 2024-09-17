@@ -16,8 +16,11 @@ const authApi = baseApi.injectEndpoints({
         body: logInData,
       }),
     }),
+    getAllUsers: builder.query({
+      query: () => "auth/users",
+    }),
   }),
 });
 
-export const { useCreateUserMutation, useSingInUserMutation } = authApi;
+export const { useCreateUserMutation, useSingInUserMutation, useGetAllUsersQuery } = authApi;
 export default authApi;
