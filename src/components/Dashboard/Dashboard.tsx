@@ -1,7 +1,7 @@
 // src/layouts/Dashboard.tsx
 import React from "react";
 import { Layout, Menu, theme } from "antd";
-import { NavLink, Outlet } from "react-router-dom";
+import { NavLink, Outlet, useLocation } from "react-router-dom";
 import {
   UserOutlined,
   ScheduleOutlined,
@@ -21,14 +21,8 @@ const menuItems = [
   {
     key: "services",
     icon: <AppstoreOutlined />,
-    // label: <NavLink to="services">Service Management</NavLink>,
     label: "Service Management",
     children: [
-      // {
-      //   key: 'services-view',
-      //   icon: <AppstoreAddOutlined />,
-      //   label: <NavLink to="services/create">Create Service</NavLink>,
-      // },
       {
         key: "services-create",
         icon: <AppstoreAddOutlined />,
@@ -53,7 +47,6 @@ const menuItems = [
       },
     ],
   },
-  // Correct user management section
   {
     key: "user",
     icon: <UserOutlined />,
@@ -82,6 +75,15 @@ const Dashboard: React.FC = () => {
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
+  const location = useLocation();
+
+  // Determine the current selected menu item based on the route
+  const currentKey = menuItems.find(item => {
+    if (item.children) {
+      return item.children.some(child => child.key === location.pathname.substring(1));
+    }
+    return item.key === location.pathname.substring(1);
+  })?.key || "home";
 
   return (
     <Layout style={{ minHeight: "100vh" }}>
@@ -99,7 +101,7 @@ const Dashboard: React.FC = () => {
         <Menu
           theme="dark"
           mode="inline"
-          defaultSelectedKeys={["home"]}
+          selectedKeys={[currentKey]}
           items={menuItems}
         />
       </Sider>

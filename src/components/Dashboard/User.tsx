@@ -1,10 +1,3 @@
-// src/components/Dashboard/User.tsx
-import React, { useState } from 'react';
-import { Card, Col, Row, Avatar, Typography, Button, Modal, Form, Input, Upload, message } from 'antd';
-import { UploadOutlined, EditOutlined, SaveOutlined } from '@ant-design/icons';
-import { useAppSelector } from '../../redux/hooks';
-import { useCurrentUser } from '../../redux/features/auth/authslice';
-import {  UserFormValues } from '../../types/UserTypes/userTypes';
 export type User = {
     _id: string;
     name: string;
@@ -15,14 +8,19 @@ export type User = {
     profilePicture?: string;
     createdAt: string;
     updatedAt: string;
-  }
+  }// src/components/Dashboard/User.tsx
+import React, { useState } from 'react';
+import { Card, Col, Row, Avatar, Typography, Button, Modal, Form, Input, Upload, message } from 'antd';
+import { UploadOutlined, EditOutlined, SaveOutlined } from '@ant-design/icons';
+import { useAppSelector } from '../../redux/hooks';
+import { useCurrentUser } from '../../redux/features/auth/authslice';
+
 const { Title, Text } = Typography;
 
 const User: React.FC = () => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const user = useAppSelector<User>(useCurrentUser as any);
+  const user = useAppSelector(useCurrentUser);
   const [isEditing, setIsEditing] = useState(false);
-  const [form] = Form.useForm<UserFormValues>();
+  const [form] = Form.useForm();
 
   // Show modal for editing user details
   const showEditModal = () => {
@@ -39,6 +37,7 @@ const User: React.FC = () => {
   const handleSave = async (values: any) => {
     try {
       // Add your update user logic here
+      // await updateUser(values);
       message.success('Profile updated successfully');
       setIsEditing(false);
     } catch (error) {
@@ -56,14 +55,14 @@ const User: React.FC = () => {
   };
 
   return (
-    <div style={{ padding: '24px', maxWidth: '1200px', margin: '0 auto' }}>
+    <div style={{ padding: '24px' }}>
       <Card
         title={<Title level={2}>User Profile</Title>}
         extra={<Button icon={<EditOutlined />} onClick={showEditModal} type="primary">Edit</Button>}
-        style={{ width: '100%' }}
+        style={{ width: '100%', maxWidth: '800px', margin: '0 auto' }}
       >
-        <Row gutter={16} align="middle">
-          <Col xs={24} sm={8} md={6} style={{ textAlign: 'center' }}>
+        <Row gutter={16}>
+          <Col span={8} style={{ textAlign: 'center' }}>
             <Avatar
               size={128}
               src={user?.profilePicture || 'https://via.placeholder.com/128'}
@@ -78,7 +77,7 @@ const User: React.FC = () => {
               <Button icon={<UploadOutlined />}>Change Picture</Button>
             </Upload>
           </Col>
-          <Col xs={24} sm={16} md={18}>
+          <Col span={16}>
             <Title level={4}>{user?.name}</Title>
             <Text>Email: {user?.email}</Text>
             <br />
@@ -137,6 +136,13 @@ const User: React.FC = () => {
             rules={[{ required: true, message: 'Please input your address!' }]}
           >
             <Input.TextArea rows={4} />
+          </Form.Item>
+          <Form.Item
+            label="New Password"
+            name="password"
+            rules={[{ required: true, message: 'Please input your new password!' }]}
+          >
+            <Input.Password />
           </Form.Item>
           <Form.Item>
             <Button type="primary" htmlType="submit" icon={<SaveOutlined />}>
