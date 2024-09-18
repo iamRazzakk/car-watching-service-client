@@ -4,9 +4,14 @@ import { Outlet } from 'react-router-dom';
 import ViewAllSlote from '../components/Dashboard/Slot/ViewAllSlote';
 import UserManagement from '../components/Dashboard/userManagement/UserManagement';
 import ViewUserBookings from '../components/Dashboard/userManagement/ViewUserBookings';
+import User from '../components/Dashboard/User';
 // import CreateService from '../components/Dashboard/services/CreateService';
 
 export const dashboardRouter = [
+  {
+    path: 'me',
+    element: <User />
+  },
   {
     path: 'services',
     element: <DashboardServices />,

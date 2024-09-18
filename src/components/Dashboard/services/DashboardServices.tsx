@@ -1,11 +1,20 @@
 import { useState } from "react";
-import { Button, Table, Tooltip, Space, Modal, Form, Input, InputNumber } from "antd";
+import {
+  Button,
+  Table,
+  Tooltip,
+  Space,
+  Modal,
+  Form,
+  Input,
+  InputNumber,
+} from "antd";
 import type { TableProps } from "antd";
 import {
   useDeleteCarServiceMutation,
   useGetAllCarServicesQuery,
   useUpdateCarServiceMutation,
-  useCreateCarServiceMutation
+  useCreateCarServiceMutation,
 } from "../../../redux/Api/services/serviceApi";
 import LoadingPage from "../../../pages/Loading/LoadingPage";
 import { toast } from "sonner";
@@ -66,6 +75,7 @@ const DashboardServices: React.FC = () => {
   };
 
   // Handle form submission for update
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleSubmit = async (values: any) => {
     if (currentRecord) {
       try {
@@ -81,6 +91,7 @@ const DashboardServices: React.FC = () => {
   };
 
   // Handle form submission for create
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleCreate = async (values: any) => {
     try {
       await createCarService(values).unwrap();
@@ -174,7 +185,13 @@ const DashboardServices: React.FC = () => {
         All Services
       </h2>
       <div className="lg:flex items-end justify-end lg:mb-8 md:mb-6 mb-4">
-        <Button type="primary" onClick={() => { setIsCreating(true); setModalVisible(true); }}>
+        <Button
+          type="primary"
+          onClick={() => {
+            setIsCreating(true);
+            setModalVisible(true);
+          }}
+        >
           Add New Service
         </Button>
       </div>
@@ -192,32 +209,45 @@ const DashboardServices: React.FC = () => {
         onCancel={() => setModalVisible(false)}
         footer={null}
       >
-        <Form form={form} layout="vertical" onFinish={handleSubmit}>
+        <Form
+          className=""
+          form={form}
+          layout="vertical"
+          onFinish={handleSubmit}
+        >
           <Form.Item
             label="Name"
             name="name"
-            rules={[{ required: true, message: "Please enter the service name!" }]}
+            rules={[
+              { required: true, message: "Please enter the service name!" },
+            ]}
           >
             <Input />
           </Form.Item>
-          <Form.Item
-            label="Duration (min)"
-            name="duration"
-            rules={[{ required: true, message: "Please enter the duration!" }]}
-          >
-            <InputNumber min={0} />
-          </Form.Item>
-          <Form.Item
-            label="Price ($)"
-            name="price"
-            rules={[{ required: true, message: "Please enter the price!" }]}
-          >
-            <InputNumber min={0} />
-          </Form.Item>
+          <div className="flex items-center justify-between">
+            <Form.Item
+              label="Duration (min)"
+              name="duration"
+              rules={[
+                { required: true, message: "Please enter the duration!" },
+              ]}
+            >
+              <InputNumber min={0} />
+            </Form.Item>
+            <Form.Item
+              label="Price ($)"
+              name="price"
+              rules={[{ required: true, message: "Please enter the price!" }]}
+            >
+              <InputNumber min={0} />
+            </Form.Item>
+          </div>
           <Form.Item
             label="Description"
             name="description"
-            rules={[{ required: true, message: "Please enter the description!" }]}
+            rules={[
+              { required: true, message: "Please enter the description!" },
+            ]}
           >
             <Input.TextArea style={{ height: 120, resize: "none" }} />
           </Form.Item>
@@ -243,7 +273,9 @@ const DashboardServices: React.FC = () => {
           <Form.Item
             label="Name"
             name="name"
-            rules={[{ required: true, message: "Please enter the service name!" }]}
+            rules={[
+              { required: true, message: "Please enter the service name!" },
+            ]}
           >
             <Input />
           </Form.Item>
@@ -264,7 +296,9 @@ const DashboardServices: React.FC = () => {
           <Form.Item
             label="Description"
             name="description"
-            rules={[{ required: true, message: "Please enter the description!" }]}
+            rules={[
+              { required: true, message: "Please enter the description!" },
+            ]}
           >
             <Input.TextArea style={{ height: 120, resize: "none" }} />
           </Form.Item>

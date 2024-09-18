@@ -62,7 +62,7 @@ const Navbar = () => {
               <>
                 <li>
                   <NavLink
-                    to="/dashboard"
+                    to="/dashboard/me"
                     className={({ isActive }) =>
                       `hover:text-black ${
                         isActive

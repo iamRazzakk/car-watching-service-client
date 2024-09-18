@@ -1,23 +1,28 @@
 // src/layouts/Dashboard.tsx
-import React from 'react';
-import { Layout, Menu, theme } from 'antd';
-import { NavLink, Outlet } from 'react-router-dom';
+import React from "react";
+import { Layout, Menu, theme } from "antd";
+import { NavLink, Outlet } from "react-router-dom";
 import {
   UserOutlined,
   ScheduleOutlined,
   AppstoreAddOutlined,
   AppstoreOutlined,
-} from '@ant-design/icons';
+} from "@ant-design/icons";
 
 const { Header, Content, Sider } = Layout;
 
 // Define the menu items with sub-navigation
 const menuItems = [
   {
-    key: 'services',
+    key: "profile",
+    icon: <UserOutlined />,
+    label: <NavLink to="me">Profile</NavLink>,
+  },
+  {
+    key: "services",
     icon: <AppstoreOutlined />,
     // label: <NavLink to="services">Service Management</NavLink>,
-    label:"Service Management",
+    label: "Service Management",
     children: [
       // {
       //   key: 'services-view',
@@ -25,50 +30,49 @@ const menuItems = [
       //   label: <NavLink to="services/create">Create Service</NavLink>,
       // },
       {
-        key: 'services-create',
+        key: "services-create",
         icon: <AppstoreAddOutlined />,
         label: <NavLink to="services">Show Service</NavLink>,
       },
-      
     ],
   },
   {
-    key: 'slot',
+    key: "slot",
     icon: <ScheduleOutlined />,
-    label: 'Slot Management',
+    label: "Slot Management",
     children: [
       {
-        key: 'slot-create',
+        key: "slot-create",
         icon: <AppstoreAddOutlined />,
         label: <NavLink to="slot/create">Create Slot</NavLink>,
       },
       {
-        key: 'slot-view',
+        key: "slot-view",
         icon: <AppstoreAddOutlined />,
         label: <NavLink to="slot/view">View Slots</NavLink>,
       },
     ],
   },
-   // Correct user management section
-   {
-    key: 'user',
+  // Correct user management section
+  {
+    key: "user",
     icon: <UserOutlined />,
-    label: 'User Management',
+    label: "User Management",
     children: [
       {
-        key: 'booking',
+        key: "booking",
         icon: <UserOutlined />,
         label: <NavLink to="user/booking">Booking Service</NavLink>,
       },
       {
-        key: 'update-role',
+        key: "update-role",
         icon: <UserOutlined />,
         label: <NavLink to="user/role">User Role Update</NavLink>,
       },
     ],
   },
   {
-    key: 'home',
+    key: "home",
     icon: <UserOutlined />,
     label: <NavLink to="/">Home</NavLink>,
   },
@@ -80,7 +84,7 @@ const Dashboard: React.FC = () => {
   } = theme.useToken();
 
   return (
-    <Layout style={{ minHeight: '100vh' }}>
+    <Layout style={{ minHeight: "100vh" }}>
       <Sider
         breakpoint="lg"
         collapsedWidth="0"
@@ -95,20 +99,20 @@ const Dashboard: React.FC = () => {
         <Menu
           theme="dark"
           mode="inline"
-          defaultSelectedKeys={['home']}
+          defaultSelectedKeys={["home"]}
           items={menuItems}
         />
       </Sider>
       <Layout>
         <Header style={{ padding: 0, background: colorBgContainer }} />
-        <Content style={{ margin: '24px 16px 0' }}>
+        <Content style={{ margin: "24px 16px 0" }}>
           <div
             style={{
               padding: 24,
-              minHeight: '100vh',
+              minHeight: "100vh",
               background: colorBgContainer,
               borderRadius: borderRadiusLG,
-              boxSizing: 'border-box',
+              boxSizing: "border-box",
             }}
           >
             <Outlet />
