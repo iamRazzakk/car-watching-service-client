@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Table, Select, Space } from 'antd';
 import { useState } from 'react';
 import { useGetAllUsersQuery, useUserUpdateRoleMutation } from '../../../redux/features/auth/authApi';
@@ -6,7 +5,7 @@ import { useGetAllUsersQuery, useUserUpdateRoleMutation } from '../../../redux/f
 const { Option } = Select;
 
 const UserManagement = () => {
-  const { data, refetch } = useGetAllUsersQuery();
+  const { data, refetch } = useGetAllUsersQuery(); 
   const [updateUserRole] = useUserUpdateRoleMutation();
   const [selectedRole, setSelectedRole] = useState<{ [key: string]: string }>({});
 

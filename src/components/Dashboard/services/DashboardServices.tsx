@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { Button, Table, Tooltip, Space, Modal, Form } from "antd";
+import { Button, Table, Tooltip, Space, Modal, Form, Input, InputNumber } from "antd";
 import type { TableProps } from "antd";
 import {
   useDeleteCarServiceMutation,
   useGetAllCarServicesQuery,
   useUpdateCarServiceMutation,
+  useCreateCarServiceMutation
 } from "../../../redux/Api/services/serviceApi";
 import LoadingPage from "../../../pages/Loading/LoadingPage";
 import { toast } from "sonner";
@@ -19,12 +20,14 @@ interface DataType {
 }
 
 const DashboardServices: React.FC = () => {
-  const { data, isLoading } = useGetAllCarServicesQuery();
+  const { data, isLoading } = useGetAllCarServicesQuery(undefined);
   const [deleteCarService] = useDeleteCarServiceMutation();
   const [updateCarService] = useUpdateCarServiceMutation();
+  const [createCarService] = useCreateCarServiceMutation();
   const [modalVisible, setModalVisible] = useState(false);
   const [currentRecord, setCurrentRecord] = useState<DataType | null>(null);
   const [form] = Form.useForm();
+  const [isCreating, setIsCreating] = useState(false);
 
   // Handle loading state
   if (isLoading) return <LoadingPage />;
@@ -62,8 +65,7 @@ const DashboardServices: React.FC = () => {
     setModalVisible(true);
   };
 
-  // Handle form submission
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // Handle form submission for update
   const handleSubmit = async (values: any) => {
     if (currentRecord) {
       try {
@@ -75,6 +77,20 @@ const DashboardServices: React.FC = () => {
           error instanceof Error ? error.message : "Failed to update service";
         toast.error(errorMessage);
       }
+    }
+  };
+
+  // Handle form submission for create
+  const handleCreate = async (values: any) => {
+    try {
+      await createCarService(values).unwrap();
+      toast.success("Service created successfully");
+      setModalVisible(false);
+      form.resetFields();
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to create service";
+      toast.error(errorMessage);
     }
   };
 
@@ -140,7 +156,7 @@ const DashboardServices: React.FC = () => {
   // Transform fetched data to fit DataType format
   const myData: DataType[] =
     data?.data
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .filter((item: any) => !item.isDeleted)
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .map((item: any) => ({
@@ -154,7 +170,14 @@ const DashboardServices: React.FC = () => {
 
   return (
     <div>
-      <h2 className="lg:text-4xl md:text-2xl text-xl font-bold text-center">All Services</h2>
+      <h2 className="lg:text-4xl md:text-2xl text-xl font-bold text-center lg:mb-8 md:mb-6 mb-4">
+        All Services
+      </h2>
+      <div className="lg:flex items-end justify-end lg:mb-8 md:mb-6 mb-4">
+        <Button type="primary" onClick={() => { setIsCreating(true); setModalVisible(true); }}>
+          Add New Service
+        </Button>
+      </div>
       <Table
         columns={columns}
         dataSource={myData}
@@ -165,7 +188,7 @@ const DashboardServices: React.FC = () => {
       {/* Edit Modal */}
       <Modal
         title="Edit Service"
-        visible={modalVisible}
+        visible={modalVisible && !isCreating}
         onCancel={() => setModalVisible(false)}
         footer={null}
       >
@@ -173,38 +196,81 @@ const DashboardServices: React.FC = () => {
           <Form.Item
             label="Name"
             name="name"
-            rules={[
-              { required: true, message: "Please enter the service name!" },
-            ]}
+            rules={[{ required: true, message: "Please enter the service name!" }]}
           >
-            <input className="border lg:px-3 py-2 rounded-md border-blue-600" type="text" />
+            <Input />
           </Form.Item>
           <Form.Item
             label="Duration (min)"
             name="duration"
             rules={[{ required: true, message: "Please enter the duration!" }]}
           >
-            <input type="number" className="border lg:px-3 py-2 rounded-md border-blue-600" />
+            <InputNumber min={0} />
           </Form.Item>
           <Form.Item
             label="Price ($)"
             name="price"
             rules={[{ required: true, message: "Please enter the price!" }]}
           >
-            <input type="number" className="border lg:px-3 py-2 rounded-md border-blue-600" />
+            <InputNumber min={0} />
           </Form.Item>
           <Form.Item
             label="Description"
             name="description"
-            rules={[
-              { required: true, message: "Please enter the description!" },
-            ]}
+            rules={[{ required: true, message: "Please enter the description!" }]}
           >
-            <textarea className="border lg:px-3 py-2 rounded-md border-blue-600" style={{ height: 120, resize: 'none' }} />
+            <Input.TextArea style={{ height: 120, resize: "none" }} />
           </Form.Item>
           <Form.Item>
             <Button type="primary" htmlType="submit">
               Save
+            </Button>
+          </Form.Item>
+        </Form>
+      </Modal>
+
+      {/* Create Modal */}
+      <Modal
+        title="Add New Service"
+        visible={modalVisible && isCreating}
+        onCancel={() => {
+          setModalVisible(false);
+          setIsCreating(false);
+        }}
+        footer={null}
+      >
+        <Form form={form} layout="vertical" onFinish={handleCreate}>
+          <Form.Item
+            label="Name"
+            name="name"
+            rules={[{ required: true, message: "Please enter the service name!" }]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            label="Duration (min)"
+            name="duration"
+            rules={[{ required: true, message: "Please enter the duration!" }]}
+          >
+            <InputNumber min={0} />
+          </Form.Item>
+          <Form.Item
+            label="Price ($)"
+            name="price"
+            rules={[{ required: true, message: "Please enter the price!" }]}
+          >
+            <InputNumber min={0} />
+          </Form.Item>
+          <Form.Item
+            label="Description"
+            name="description"
+            rules={[{ required: true, message: "Please enter the description!" }]}
+          >
+            <Input.TextArea style={{ height: 120, resize: "none" }} />
+          </Form.Item>
+          <Form.Item>
+            <Button type="primary" htmlType="submit">
+              Create
             </Button>
           </Form.Item>
         </Form>

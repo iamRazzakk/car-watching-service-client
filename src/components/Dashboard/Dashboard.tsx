@@ -16,7 +16,21 @@ const menuItems = [
   {
     key: 'services',
     icon: <AppstoreOutlined />,
-    label: <NavLink to="services">Service Management</NavLink>,
+    // label: <NavLink to="services">Service Management</NavLink>,
+    label:"Service Management",
+    children: [
+      // {
+      //   key: 'services-view',
+      //   icon: <AppstoreAddOutlined />,
+      //   label: <NavLink to="services/create">Create Service</NavLink>,
+      // },
+      {
+        key: 'services-create',
+        icon: <AppstoreAddOutlined />,
+        label: <NavLink to="services">Show Service</NavLink>,
+      },
+      
+    ],
   },
   {
     key: 'slot',
@@ -42,9 +56,9 @@ const menuItems = [
     label: 'User Management',
     children: [
       {
-        key: 'user-create',
+        key: 'booking',
         icon: <UserOutlined />,
-        label: <NavLink to="user/create">Create User</NavLink>,
+        label: <NavLink to="user/booking">Booking Service</NavLink>,
       },
       {
         key: 'update-role',
