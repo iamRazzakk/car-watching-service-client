@@ -1,55 +1,61 @@
-import DashboardServices from '../components/Dashboard/services/DashboardServices';
-import CreateSlot from '../components/Dashboard/Slot/CreateSlot';
-import { Outlet } from 'react-router-dom';
-import ViewAllSlote from '../components/Dashboard/Slot/ViewAllSlote';
-import UserManagement from '../components/Dashboard/userManagement/UserManagement';
-import ViewUserBookings from '../components/Dashboard/userManagement/ViewUserBookings';
-import User from '../components/Dashboard/User';
-// import CreateService from '../components/Dashboard/services/CreateService';
+import { Outlet } from "react-router-dom";
+import DashboardServices from "../components/Dashboard/services/DashboardServices";
+import CreateSlot from "../components/Dashboard/Slot/CreateSlot";
+import ViewAllSlote from "../components/Dashboard/Slot/ViewAllSlote";
+import UserManagement from "../components/Dashboard/userManagement/UserManagement";
+import ViewUserBookings from "../components/Dashboard/userManagement/ViewUserBookings";
+import User from "../components/Dashboard/User";
+import { PrivateRoute } from "./PrivateRoute";
 
 export const dashboardRouter = [
   {
-    path: 'me',
-    element: <User />
+    path: "me",
+    element: <User />,
   },
   {
-    path: 'services',
-    element: <DashboardServices />,
-    children: [
-      // {
-      //   path: 'services',
-      //   element: <CreateSlot />,
-      // },
-      // {
-      //   path: 'create',
-      //   element: <CreateService />,
-      // },
-    ],
+    path: "services",
+    element: (
+      <PrivateRoute allowedRoles={["ADMIN"]}>
+        <DashboardServices />
+      </PrivateRoute>
+    ),
   },
   {
-    path: 'slot',
-    element: <div><Outlet /></div>,
+    path: "slot",
+    element: (
+      <PrivateRoute allowedRoles={["ADMIN"]}>
+        <div>
+          <Outlet />
+        </div>
+      </PrivateRoute>
+    ),
     children: [
       {
-        path: 'create',
+        path: "create",
         element: <CreateSlot />,
       },
       {
-        path: 'view',
+        path: "view",
         element: <ViewAllSlote />,
       },
     ],
   },
   {
-    path: 'user',
-    element: <div><Outlet /></div>,
+    path: "user",
+    element: (
+      <PrivateRoute allowedRoles={["ADMIN"]}>
+        <div>
+          <Outlet />
+        </div>
+      </PrivateRoute>
+    ),
     children: [
       {
-        path: 'booking',
-        element:  <ViewUserBookings />,
+        path: "booking",
+        element: <ViewUserBookings />,
       },
       {
-        path: 'role',
+        path: "role",
         element: <UserManagement />,
       },
     ],

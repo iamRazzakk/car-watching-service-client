@@ -1,9 +1,9 @@
 import { RouterProvider } from "react-router-dom";
-import { userRouter } from "./hooks/useRoutes";
 import { Toaster } from "sonner";
+import { useRouter } from "./hooks/useRoutes";
 
 function App() {
-  const router = userRouter();
+  const router = useRouter();
   return (
     <>
       <Toaster />

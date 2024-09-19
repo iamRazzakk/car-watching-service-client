@@ -1,19 +1,24 @@
-export type User = {
-    _id: string;
-    name: string;
-    email: string;
-    phone: string;
-    address: string;
-    role: string;
-    profilePicture?: string;
-    createdAt: string;
-    updatedAt: string;
-  }// src/components/Dashboard/User.tsx
-import React, { useState } from 'react';
-import { Card, Col, Row, Avatar, Typography, Button, Modal, Form, Input, Upload, message } from 'antd';
-import { UploadOutlined, EditOutlined, SaveOutlined } from '@ant-design/icons';
-import { useAppSelector } from '../../redux/hooks';
-import { useCurrentUser } from '../../redux/features/auth/authslice';
+import React, { useState } from "react";
+import {
+  Card,
+  Col,
+  Row,
+  Avatar,
+  Typography,
+  Button,
+  Modal,
+  Form,
+  Input,
+  Upload,
+  message,
+} from "antd";
+import { UploadOutlined, EditOutlined, SaveOutlined } from "@ant-design/icons";
+import { useAppSelector } from "../../redux/hooks";
+import { useCurrentUser } from "../../redux/features/auth/authslice";
+import {
+  useChangePasswordMutation,
+  useUploadProfilePictureMutation,
+} from "../../redux/Api/AuthApi/authApi";
 
 const { Title, Text } = Typography;
 
@@ -21,6 +26,10 @@ const User: React.FC = () => {
   const user = useAppSelector(useCurrentUser);
   const [isEditing, setIsEditing] = useState(false);
   const [form] = Form.useForm();
+
+  // Upload mutation
+  const [uploadProfilePicture] = useUploadProfilePictureMutation();
+  const [changePassword] = useChangePasswordMutation();
 
   // Show modal for editing user details
   const showEditModal = () => {
@@ -36,43 +45,58 @@ const User: React.FC = () => {
   // Handle form submit
   const handleSave = async (values: any) => {
     try {
-      // Add your update user logic here
-      // await updateUser(values);
-      message.success('Profile updated successfully');
+      // Handle password change if applicable
+      if (values.password) {
+        await changePassword({ oldPassword: "", newPassword: values.password }); // Replace '' with old password
+      }
+
+      // Handle user profile update
+      await uploadProfilePicture(new FormData(document.querySelector("form"))); // Adjust as needed
+
+      message.success("Profile updated successfully");
       setIsEditing(false);
     } catch (error) {
-      message.error('Failed to update profile');
+      message.error("Failed to update profile");
     }
   };
 
   // Upload change handler
-  const handleUploadChange = (info: any) => {
-    if (info.file.status === 'done') {
+  const handleUploadChange = async (info: any) => {
+    if (info.file.status === "done") {
       message.success(`${info.file.name} file uploaded successfully`);
-    } else if (info.file.status === 'error') {
+    } else if (info.file.status === "error") {
       message.error(`${info.file.name} file upload failed.`);
     }
   };
 
   return (
-    <div style={{ padding: '24px' }}>
+    <div style={{ padding: "24px" }}>
       <Card
         title={<Title level={2}>User Profile</Title>}
-        extra={<Button icon={<EditOutlined />} onClick={showEditModal} type="primary">Edit</Button>}
-        style={{ width: '100%', maxWidth: '800px', margin: '0 auto' }}
+        extra={
+          <Button
+            icon={<EditOutlined />}
+            onClick={showEditModal}
+            type="primary"
+          >
+            Edit
+          </Button>
+        }
+        style={{ width: "100%", maxWidth: "800px", margin: "0 auto" }}
       >
         <Row gutter={16}>
-          <Col span={8} style={{ textAlign: 'center' }}>
+          <Col span={8} style={{ textAlign: "center" }}>
             <Avatar
               size={128}
-              src={user?.profilePicture || 'https://via.placeholder.com/128'}
-              style={{ marginBottom: '16px' }}
+              src={user?.profilePicture || "https://via.placeholder.com/128"}
+              style={{ marginBottom: "16px" }}
             />
             <Upload
               name="profilePicture"
               showUploadList={false}
-              action="/upload" // Replace with your upload endpoint
+              action="http://localhost:5000/api/auth/users/profile"
               onChange={handleUploadChange}
+              // headers={{ Authorization: `Bearer ${yourAuthToken}` }}
             >
               <Button icon={<UploadOutlined />}>Change Picture</Button>
             </Upload>
@@ -112,36 +136,34 @@ const User: React.FC = () => {
           <Form.Item
             label="Name"
             name="name"
-            rules={[{ required: true, message: 'Please input your name!' }]}
+            rules={[{ required: true, message: "Please input your name!" }]}
           >
             <Input />
           </Form.Item>
           <Form.Item
             label="Email"
             name="email"
-            rules={[{ required: true, message: 'Please input your email!' }]}
+            rules={[{ required: true, message: "Please input your email!" }]}
           >
             <Input />
           </Form.Item>
           <Form.Item
             label="Phone"
             name="phone"
-            rules={[{ required: true, message: 'Please input your phone number!' }]}
+            rules={[
+              { required: true, message: "Please input your phone number!" },
+            ]}
           >
             <Input />
           </Form.Item>
           <Form.Item
             label="Address"
             name="address"
-            rules={[{ required: true, message: 'Please input your address!' }]}
+            rules={[{ required: true, message: "Please input your address!" }]}
           >
             <Input.TextArea rows={4} />
           </Form.Item>
-          <Form.Item
-            label="New Password"
-            name="password"
-            rules={[{ required: true, message: 'Please input your new password!' }]}
-          >
+          <Form.Item label="New Password" name="password">
             <Input.Password />
           </Form.Item>
           <Form.Item>

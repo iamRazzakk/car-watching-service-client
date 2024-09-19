@@ -3,7 +3,10 @@ import { Table, Button, Tag, Dropdown, Menu } from "antd";
 import { DownOutlined } from "@ant-design/icons";
 import { toast } from "sonner";
 import LoadingPage from "../../../pages/Loading/LoadingPage";
-import { useGetAllSlotsQuery, useUpdateSlotStatusMutation } from "../../../redux/Api/slot/slotApi";
+import {
+  useGetAllSlotsQuery,
+  useUpdateSlotStatusMutation,
+} from "../../../redux/Api/slot/slotApi";
 
 // Define types for the slot data
 interface Slot {
@@ -14,42 +17,47 @@ interface Slot {
   date: string;
   startTime: string;
   endTime: string;
-  isBooked: 'available' | 'canceled';
+  isBooked: "available" | "canceled";
 }
 
 const ViewAllSlote: React.FC = () => {
-  const { data: slots, isLoading: slotsLoading } = useGetAllSlotsQuery();
+  const { data: slots, isLoading: slotsLoading } =
+    useGetAllSlotsQuery(undefined);
   const [updateSlotStatus] = useUpdateSlotStatusMutation();
 
-  const handleStatusUpdate = async (slotId: string, newStatus: 'available' | 'canceled') => {
+  const handleStatusUpdate = async (
+    slotId: string,
+    newStatus: "available" | "canceled"
+  ) => {
     try {
       await updateSlotStatus({ id: slotId, status: newStatus }).unwrap();
       toast.success("Slot status updated successfully");
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       let errorMessage = "Error updating status";
       if (error?.data?.message) {
         errorMessage = error.data.message;
       } else if (error?.message) {
-        errorMessage = error.message; 
+        errorMessage = error.message;
       }
       toast.error(errorMessage);
     }
   };
 
-  const getMenu = (slotId: string, currentStatus: 'available' | 'canceled') => (
+  const getMenu = (slotId: string, currentStatus: "available" | "canceled") => (
     <Menu>
-      {currentStatus === 'available' && (
+      {currentStatus === "available" && (
         <Menu.Item
           key="canceled"
-          onClick={() => handleStatusUpdate(slotId, 'canceled')}
+          onClick={() => handleStatusUpdate(slotId, "canceled")}
         >
           Cancel
         </Menu.Item>
       )}
-      {currentStatus === 'canceled' && (
+      {currentStatus === "canceled" && (
         <Menu.Item
           key="available"
-          onClick={() => handleStatusUpdate(slotId, 'available')}
+          onClick={() => handleStatusUpdate(slotId, "available")}
         >
           Available
         </Menu.Item>
@@ -60,7 +68,8 @@ const ViewAllSlote: React.FC = () => {
   if (slotsLoading) return <LoadingPage />;
 
   // Map to include both available and canceled slots
-  const filteredSlots: Slot[] = (slots?.data || []).map(slot => slot);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const filteredSlots: Slot[] = (slots?.data || []).map((slot: any) => slot);
 
   const columns = [
     {
@@ -87,9 +96,9 @@ const ViewAllSlote: React.FC = () => {
       title: "Status",
       dataIndex: "isBooked",
       key: "status",
-      render: (status: 'available' | 'canceled') => (
-        <Tag color={status === 'available' ? "green" : "volcano"}>
-          {status === 'available' ? "Available" : "Canceled"}
+      render: (status: "available" | "canceled") => (
+        <Tag color={status === "available" ? "green" : "volcano"}>
+          {status === "available" ? "Available" : "Canceled"}
         </Tag>
       ),
     },
@@ -99,7 +108,7 @@ const ViewAllSlote: React.FC = () => {
       render: (slot: Slot) => (
         <Dropdown
           overlay={getMenu(slot._id, slot.isBooked)}
-          trigger={['click']}
+          trigger={["click"]}
         >
           <Button>
             Actions <DownOutlined />

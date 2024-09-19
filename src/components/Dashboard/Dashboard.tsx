@@ -1,22 +1,24 @@
-// src/layouts/Dashboard.tsx
 import React from "react";
 import { Layout, Menu, theme } from "antd";
-import { NavLink, Outlet, useLocation } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 import {
   UserOutlined,
   ScheduleOutlined,
   AppstoreAddOutlined,
   AppstoreOutlined,
 } from "@ant-design/icons";
+import { useAppSelector } from "../../redux/hooks";
+import { useCurrentUser } from "../../redux/features/auth/authslice";
 
 const { Header, Content, Sider } = Layout;
 
 // Define the menu items with sub-navigation
-const menuItems = [
+const adminMenuItems = [
   {
     key: "profile",
     icon: <UserOutlined />,
-    label: <NavLink to="me">Profile</NavLink>,
+    label: "Profile",
+    path: "me",
   },
   {
     key: "services",
@@ -26,7 +28,8 @@ const menuItems = [
       {
         key: "services-create",
         icon: <AppstoreAddOutlined />,
-        label: <NavLink to="services">Show Service</NavLink>,
+        label: "Show Service",
+        path: "services",
       },
     ],
   },
@@ -38,12 +41,14 @@ const menuItems = [
       {
         key: "slot-create",
         icon: <AppstoreAddOutlined />,
-        label: <NavLink to="slot/create">Create Slot</NavLink>,
+        label: "Create Slot",
+        path: "slot/create",
       },
       {
         key: "slot-view",
         icon: <AppstoreAddOutlined />,
-        label: <NavLink to="slot/view">View Slots</NavLink>,
+        label: "View Slots",
+        path: "slot/view",
       },
     ],
   },
@@ -55,19 +60,49 @@ const menuItems = [
       {
         key: "booking",
         icon: <UserOutlined />,
-        label: <NavLink to="user/booking">Booking Service</NavLink>,
+        label: "Booking Service",
+        path: "user/booking",
       },
       {
         key: "update-role",
         icon: <UserOutlined />,
-        label: <NavLink to="user/role">User Role Update</NavLink>,
+        label: "User Role Update",
+        path: "user/role",
       },
     ],
   },
   {
     key: "home",
     icon: <UserOutlined />,
-    label: <NavLink to="/">Home</NavLink>,
+    label: "Home",
+    path: "/",
+  },
+];
+
+const userMenuItems = [
+  {
+    key: "profile",
+    icon: <UserOutlined />,
+    label: "Profile",
+    path: "me",
+  },
+  {
+    key: "past-bookings",
+    icon: <UserOutlined />,
+    label: "Past-bookings",
+    path: "past-bookings",
+  },
+  {
+    key: "upcoming-bookings",
+    icon: <UserOutlined />,
+    label: "Upcoming-bookings",
+    path: "upcoming-bookings",
+  },
+  {
+    key: "home",
+    icon: <UserOutlined />,
+    label: "Home",
+    path: "/",
   },
 ];
 
@@ -75,15 +110,30 @@ const Dashboard: React.FC = () => {
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
-  const location = useLocation();
+  const navigate = useNavigate();
+  const currentUser = useAppSelector(useCurrentUser);
 
-  // Determine the current selected menu item based on the route
-  const currentKey = menuItems.find(item => {
-    if (item.children) {
-      return item.children.some(child => child.key === location.pathname.substring(1));
+  // Determine if the user is an admin
+  const isAdmin = currentUser?.role === 'ADMIN';
+
+  // Filter menu items based on the user role
+  const menuItems = isAdmin ? adminMenuItems : userMenuItems;
+
+  // Handle navigation on menu item click
+  const handleMenuClick = (menuInfo: any) => {
+    const clickedItem = menuItems.find(item =>
+      item.key === menuInfo.key || item.children?.find(child => child.key === menuInfo.key)
+    );
+
+    if (clickedItem?.path) {
+      navigate(clickedItem.path);
+    } else {
+      const childItem = clickedItem?.children?.find(child => child.key === menuInfo.key);
+      if (childItem?.path) {
+        navigate(childItem.path);
+      }
     }
-    return item.key === location.pathname.substring(1);
-  })?.key || "home";
+  };
 
   return (
     <Layout style={{ minHeight: "100vh" }}>
@@ -101,7 +151,7 @@ const Dashboard: React.FC = () => {
         <Menu
           theme="dark"
           mode="inline"
-          selectedKeys={[currentKey]}
+          onClick={handleMenuClick}
           items={menuItems}
         />
       </Sider>
