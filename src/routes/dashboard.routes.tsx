@@ -51,6 +51,10 @@ export const dashboardRouter = [
     ),
     children: [
       {
+        path: "booking-create",
+        element: <ViewUserBookings />,
+      },
+      {
         path: "booking",
         element: <ViewUserBookings />,
       },

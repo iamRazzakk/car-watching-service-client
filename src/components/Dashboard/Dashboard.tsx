@@ -87,6 +87,12 @@ const userMenuItems = [
     path: "me",
   },
   {
+    key: "C.Service-bookings",
+    icon: <UserOutlined />,
+    label: "C.Service-bookings",
+    path: "create-bookings",
+  },
+  {
     key: "past-bookings",
     icon: <UserOutlined />,
     label: "Past-bookings",
