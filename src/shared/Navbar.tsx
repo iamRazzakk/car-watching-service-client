@@ -3,6 +3,7 @@ import { Link, NavLink } from "react-router-dom";
 import logo from "../assets/logo.png";
 import { logOut, useCurrentUser } from "../redux/features/auth/authslice";
 import { useAppSelector } from "../redux/hooks";
+import { LuShoppingBag } from "react-icons/lu";
 
 const Navbar = () => {
   const dispatch = useDispatch();
@@ -98,6 +99,9 @@ const Navbar = () => {
               </li>
             )}
           </ul>
+          <Link to="/booking">
+            <LuShoppingBag className="w-6 h-6 text-white" />
+          </Link>
         </div>
       </div>
     </nav>

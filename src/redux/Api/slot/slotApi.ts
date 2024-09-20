@@ -11,7 +11,10 @@ const slotApi = baseApi.injectEndpoints({
       invalidatesTags: ["SlotList"],
     }),
     getAllSlots: builder.query({
-      query: () => "/slots/availability",
+      query: (date) => ({
+        url: "/slots/availability",
+        params: date,
+      }),
       providesTags: ["SlotList"],
     }),
 
@@ -25,6 +28,7 @@ const slotApi = baseApi.injectEndpoints({
     }),
   }),
 });
+
 export const {
   useCreateSlotMutation,
   useGetAllSlotsQuery,

@@ -1,34 +1,56 @@
-import React from "react";
+import React, { useState } from "react";
 import { useParams } from "react-router-dom";
 import { useGetCarServiceByIdQuery } from "../../redux/Api/services/serviceApi";
 import LoadingPage from "../Loading/LoadingPage";
 import { FaDollarSign, FaClock } from "react-icons/fa";
 import Button from "../../shared/Button/Button";
 import NavigationButtons from "../../shared/NavigationButtons/NavigationButtons";
+import { DatePicker } from "antd";
+import moment, { Moment } from "moment";
+import { useGetAllSlotsQuery } from "../../redux/Api/slot/slotApi";
+import { useDispatch } from "react-redux";
+import { setSelectedService } from "../../redux/features/auth/bookingSlice";
 
 const ServiceDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const {
-    data: service,
-    isLoading
-  } = useGetCarServiceByIdQuery(id);
-//   console.log(service.data);
-  const serviceList = service?.data
-  console.log(serviceList);
-  if (isLoading) return <LoadingPage />;
+  const [selectedDate, setSelectedDate] = useState<Moment>(moment());
+  const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
+  const dispatch = useDispatch();
+
+  // Fetching service details
+  const { data: service, isLoading: serviceLoading } = useGetCarServiceByIdQuery(id);
+
+  // Fetching available slots for the selected service and date
+  const { data: slots, isLoading: slotsLoading } = useGetAllSlotsQuery({
+    serviceId: id,
+    date: selectedDate.format("YYYY-MM-DD"),
+  });
+
+  const serviceList = service?.data;
+
+  if (serviceLoading || slotsLoading) return <LoadingPage />;
+
+  const handleSlotSelect = (slotId: string) => {
+    setSelectedSlot(slotId);
+  };
+
+  const handleBookService = () => {
+    const selectedSlotData = slots?.data.find((slot: any) => slot._id === selectedSlot);
+    if (serviceList && selectedSlotData) {
+      dispatch(setSelectedService(serviceList));
+      dispatch(setSelectedSlot(selectedSlotData));
+    }
+  };
 
   return (
     <div className="container mx-auto p-4 lg:p-8">
-      <NavigationButtons  />
+      <NavigationButtons />
       {service ? (
         <div className="flex flex-col lg:flex-row bg-white shadow-lg rounded-lg overflow-hidden lg:mt-8 md:mt-4">
           {/* Image Section */}
           <div className="w-full lg:w-1/2">
             <img
-              src={
-                serviceList?.imageUrl ||
-                ""
-              }
+              src={serviceList?.imageUrl || ""}
               alt="Service Image"
               className="w-full h-80 object-cover"
             />
@@ -54,16 +76,54 @@ const ServiceDetailPage: React.FC = () => {
                   </div>
                 </div>
               </div>
+
+              {/* Ant Design DatePicker */}
+              <div className="my-4">
+                <h3 className="font-semibold text-xl mb-2">Select a Date:</h3>
+                <DatePicker
+                  value={selectedDate}
+                  onChange={(date) => setSelectedDate(date as Moment)}
+                  format="YYYY-MM-DD"
+                  className="p-2 border rounded-md"
+                />
+              </div>
+
+              {/* Slot Selection Section */}
+              <div className="my-4">
+                <h3 className="font-semibold text-xl mb-2">
+                  Available Time Slots:
+                </h3>
+                <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+                  {slots?.data?.map((slot: any) => (
+                    <button
+                      key={slot._id}
+                      onClick={() => handleSlotSelect(slot._id)}
+                      className={`py-2 px-4 rounded-lg shadow-md transition-colors ${
+                        slot.isBooked === "booked"
+                          ? "bg-gray-300 cursor-not-allowed"
+                          : selectedSlot === slot._id
+                          ? "bg-green-500 text-white"
+                          : "bg-blue-500 text-white"
+                      }`}
+                      disabled={slot.isBooked === "booked"}
+                    >
+                      {slot.startTime} - {slot.endTime}
+                    </button>
+                  ))}
+                </div>
+              </div>
             </div>
-            <Button
-              onClick={() =>
-                console.log("Book Now clicked for service:", service)
-              }
-              category="primary"
-              text="Book Now"
-              type="button"
-              className="w-full py-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600 transition-colors"
-            />
+
+            {/* Book Button */}
+            {selectedSlot && (
+              <Button
+                onClick={handleBookService}
+                category="primary"
+                text="Book This Service"
+                type="button"
+                className="w-full py-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600 transition-colors"
+              />
+            )}
           </div>
         </div>
       ) : (

@@ -1,4 +1,5 @@
 import AboutUs from "../pages/AboutUs/AboutUs";
+import ServiceBooking from "../pages/Booking/ServiceBooking";
 import ContactUs from "../pages/ContactUs/ContactUs";
 import Home from "../pages/Home";
 import ServiceDetailPage from "../pages/ServicePage/ServiceDetailPage";
@@ -24,5 +25,9 @@ export const MainRoutes = [
   {
     path:"/services/:id",
     element:<ServiceDetailPage />
+  },
+  {
+    path:'booking',
+    element:<ServiceBooking/>
   }
 ];
