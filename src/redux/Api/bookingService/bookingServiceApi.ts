@@ -1,4 +1,3 @@
-// src/redux/features/booking/bookingServiceApi.ts
 import { baseApi } from "../baseApi";
 
 // Define the bookingServiceApi with endpoints

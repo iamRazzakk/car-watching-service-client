@@ -5,6 +5,7 @@ import { FaClock, FaDollarSign } from "react-icons/fa";
 import { useCurrentUser } from "../../redux/features/auth/authslice";
 import { Form, Input, Button, InputNumber, Row, Col, Card, Select } from "antd";
 import NavigationButtons from "../../shared/NavigationButtons/NavigationButtons";
+import { useMakePaymentMutation } from "../../redux/Api/paymentApi/paymentApi";
 
 // Vehicle types array
 export const vehicleTypeArray = [
@@ -24,31 +25,66 @@ const ServiceBooking: React.FC = () => {
   const allBookings = useAppSelector(getAllSlotBooking);
   const currentUser = useAppSelector(useCurrentUser);
 
+  const [makePayment, { isLoading, isSuccess, isError }] =
+    useMakePaymentMutation();
+
   const [userData, setUserData] = useState({
     userName: currentUser?.name,
     email: currentUser?.email,
+    address: currentUser?.address,
+    phone: currentUser?.phone,
     vehicleType: "",
     vehicleBrand: "",
     vehicleModel: "",
     manufacturingYear: undefined,
     registrationPlate: "",
   });
-
+  
+  console.log("User Data:", userData);
   const selectedBooking = allBookings[0];
 
   if (!selectedBooking) {
+    console.log("No booking found.");
     return <div>No booking found.</div>;
   }
 
-  const handleSubmit = (values: any) => {
+  const handleSubmit = async (values: any) => {
     const formData = {
-      ...values,
-      manufacturingYear: parseInt(values.manufacturingYear, 10),
+      user: {
+        name: values.userName,
+        email: values.email,
+        phone: currentUser?.phone,
+        address: currentUser?.address,
+      },
+      vehicleDetails: {
+        vehicleType: values.vehicleType,
+        vehicleBrand: values.vehicleBrand,
+        vehicleModel: values.vehicleModel,
+        manufacturingYear: parseInt(values.manufacturingYear, 10),
+        registrationPlate: values.registrationPlate,
+      },
+      serviceDetails: {
+        serviceId: selectedBooking._id,
+        serviceName: selectedBooking.serviceName,
+        startTime: selectedBooking.startTime,
+        endTime: selectedBooking.endTime,
+        duration: selectedBooking.duration,
+        price: selectedBooking.price,
+      },
+      totalPrice: selectedBooking.price,
+      userId: currentUser?._id,
     };
-
-    // Payment processing logic here
-    console.log("Payment processed for:", formData);
+  
+    console.log("Submitting Payment with Form Data:", formData); 
+  
+    try {
+      const paymentResponse = await makePayment(formData).unwrap();
+      console.log("Payment successful:", paymentResponse);
+    } catch (error) {
+      console.error("Payment failed:", error.data.message);
+    }
   };
+  
 
   return (
     <div className="p-4">
@@ -118,14 +154,9 @@ const ServiceBooking: React.FC = () => {
               <Form.Item
                 label="Vehicle Type"
                 name="vehicleType"
-                rules={[
-                  { required: true, message: "Please select a vehicle type" },
-                ]}
+                rules={[{ required: true, message: "Please select a vehicle type" }]}
               >
-                <Select
-                  placeholder="Select vehicle type"
-                  allowClear
-                >
+                <Select placeholder="Select vehicle type" allowClear>
                   {vehicleTypeArray.map((type) => (
                     <Select.Option key={type} value={type}>
                       {type}
@@ -137,9 +168,7 @@ const ServiceBooking: React.FC = () => {
               <Form.Item
                 label="Vehicle Brand"
                 name="vehicleBrand"
-                rules={[
-                  { required: true, message: "Please enter vehicle brand" },
-                ]}
+                rules={[{ required: true, message: "Please enter vehicle brand" }]}
               >
                 <Input placeholder="Enter vehicle brand" />
               </Form.Item>
@@ -147,9 +176,7 @@ const ServiceBooking: React.FC = () => {
               <Form.Item
                 label="Vehicle Model"
                 name="vehicleModel"
-                rules={[
-                  { required: true, message: "Please enter vehicle model" },
-                ]}
+                rules={[{ required: true, message: "Please enter vehicle model" }]}
               >
                 <Input placeholder="Enter vehicle model" />
               </Form.Item>
@@ -157,12 +184,7 @@ const ServiceBooking: React.FC = () => {
               <Form.Item
                 label="Manufacturing Year"
                 name="manufacturingYear"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please enter manufacturing year",
-                  },
-                ]}
+                rules={[{ required: true, message: "Please enter manufacturing year" }]}
               >
                 <InputNumber
                   placeholder="Enter year"
@@ -175,21 +197,24 @@ const ServiceBooking: React.FC = () => {
               <Form.Item
                 label="Registration Plate"
                 name="registrationPlate"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please enter registration plate",
-                  },
-                ]}
+                rules={[{ required: true, message: "Please enter registration plate" }]}
               >
                 <Input placeholder="Enter registration plate" />
               </Form.Item>
 
               <Form.Item>
-                <Button type="primary" htmlType="submit" block>
-                  Pay Now
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  block
+                  loading={isLoading}
+                >
+                  {isLoading ? "Processing..." : "Pay Now"}
                 </Button>
               </Form.Item>
+
+              {isError && <div style={{ color: "red" }}>Payment failed</div>}
+              {isSuccess && <div style={{ color: "green" }}>Payment successful</div>}
             </Form>
           </Card>
         </Col>
