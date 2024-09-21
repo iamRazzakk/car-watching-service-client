@@ -18,24 +18,25 @@ const persisConfig = {
   key: "auth",
   storage,
 };
+const persisBookingConfig = {
+  key: "slotBookmarks",
+  storage,
+};
+
 const persistAuthReducer = persistReducer(persisConfig, authReducer);
+const parsistSloteBooking = persistReducer(persisBookingConfig, bookingReducer);
 export const store = configureStore({
   reducer: {
     auth: persistAuthReducer,
     services: servicesReducer,
-    booking: bookingReducer,
+    slotBookmarks: parsistSloteBooking,
     [baseApi.reducerPath]: baseApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
-      serializableCheck:{
-        ignoredActions:[FLUSH,
-          REHYDRATE,
-          PAUSE,
-          PERSIST,
-          PURGE,
-          REGISTER,]
-      }
+      serializableCheck: {
+        ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
+      },
     }).concat(baseApi.middleware),
 });
 

@@ -1,44 +1,52 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { RootState } from "../../store";
 
-interface Slot {
-  _id: string;
+
+export type TSlotBookmark = {
+  serviceId: string;
+  slotId: string;
+  serviceName: string;
+  serviceImage: string;
+  duration: number;
+  price: number;
   startTime: string;
   endTime: string;
-  isBooked: string;
-}
-
-interface Service {
-  _id: string;
-  name: string;
-  description: string;
-  price: string;
-  duration: string;
-  imageUrl: string;
-}
-
-interface BookingState {
-  selectedService: Service | null;
-  selectedSlot: Slot | null;
-}
-
-const initialState: BookingState = {
-  selectedService: null,
-  selectedSlot: null,
 };
 
-const bookingSlice = createSlice({
-  name: 'booking',
+type SlotBookmarkState = {
+  bookmarks: TSlotBookmark[];
+};
+
+const initialState: SlotBookmarkState = {
+  bookmarks: [],
+};
+
+const slotBookmarkSlice = createSlice({
+  name: "slotBookmarks",
   initialState,
   reducers: {
-    setSelectedService(state, action: PayloadAction<Service | null>) {
-      state.selectedService = action.payload;
+    addBookmark: (state, action: PayloadAction<TSlotBookmark>) => {
+      const bookmarkExists = state.bookmarks.some(
+        (bookmark) => bookmark.slotId === action.payload.slotId
+      );
+      if (!bookmarkExists) {
+        state.bookmarks.push(action.payload);
+      }
     },
-    setSelectedSlot(state, action: PayloadAction<Slot | null>) {
-      state.selectedSlot = action.payload;
+    removeBookmark: (state, action: PayloadAction<string>) => {
+      state.bookmarks = state.bookmarks.filter(
+        (bookmark) => bookmark.slotId !== action.payload
+      );
+    },
+    clearBookmarks: (state) => {
+      state.bookmarks = [];
     },
   },
 });
 
-export const { setSelectedService, setSelectedSlot } = bookingSlice.actions;
+export const { addBookmark, removeBookmark, clearBookmarks } =
+  slotBookmarkSlice.actions;
+export default slotBookmarkSlice.reducer;
 
-export default bookingSlice.reducer;
+export const getAllSlotBooking = (state: RootState) =>
+  state.slotBookmarks.bookmarks;

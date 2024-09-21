@@ -1,101 +1,199 @@
-import { Input, Form, Button } from "antd";
-import { FaDollarSign, FaClock } from "react-icons/fa";
-import { useAppSelector, useAppDispatch } from "../../redux/hooks";
-import { useState } from "react";
+import React, { useState } from "react";
+import { useAppSelector } from "../../redux/hooks";
+import { getAllSlotBooking } from "../../redux/features/auth/bookingSlice";
+import { FaClock, FaDollarSign } from "react-icons/fa";
+import { useCurrentUser } from "../../redux/features/auth/authslice";
+import { Form, Input, Button, InputNumber, Row, Col, Card, Select } from "antd";
+import NavigationButtons from "../../shared/NavigationButtons/NavigationButtons";
 
-const ServiceBooking = () => {
-  const dispatch = useAppDispatch();
-  const selectedService = useAppSelector((state) => state.booking.selectedService);
-  const selectedSlot = useAppSelector((state) => state.booking.selectedSlot);
-  const user = useAppSelector((state) => state.auth.user);
-  const [isLoading, setIsLoading] = useState(false);
+// Vehicle types array
+export const vehicleTypeArray = [
+  "car",
+  "truck",
+  "SUV",
+  "van",
+  "motorcycle",
+  "bus",
+  "electricVehicle",
+  "hybridVehicle",
+  "bicycle",
+  "tractor",
+] as const;
 
-  console.log("selectedSlot from Redux store:", selectedSlot);
+const ServiceBooking: React.FC = () => {
+  const allBookings = useAppSelector(getAllSlotBooking);
+  const currentUser = useAppSelector(useCurrentUser);
 
-  const handlePayment = () => {
-    setIsLoading(true);
-    console.log("Proceed to payment");
-    setTimeout(() => setIsLoading(false), 2000); // Simulate payment process
+  const [userData, setUserData] = useState({
+    userName: currentUser?.name,
+    email: currentUser?.email,
+    vehicleType: "",
+    vehicleBrand: "",
+    vehicleModel: "",
+    manufacturingYear: undefined,
+    registrationPlate: "",
+  });
+
+  const selectedBooking = allBookings[0];
+
+  if (!selectedBooking) {
+    return <div>No booking found.</div>;
+  }
+
+  const handleSubmit = (values: any) => {
+    const formData = {
+      ...values,
+      manufacturingYear: parseInt(values.manufacturingYear, 10),
+    };
+
+    // Payment processing logic here
+    console.log("Payment processed for:", formData);
   };
 
   return (
-    <div className="container mx-auto p-8 lg:p-12 flex flex-col lg:flex-row gap-8">
-      {/* Left Side: Cart Summary */}
-      <div className="w-full lg:w-1/2 bg-white shadow-lg rounded-lg p-6 border border-gray-300">
-        <h2 className="text-3xl font-bold mb-4 border-b border-gray-200 pb-2">
-          Booking Cart
-        </h2>
-        {selectedService ? (
-          <div className="flex flex-col space-y-4">
-            <img
-              src={selectedService.imageUrl || ""}
-              alt="Service Image"
-              className="w-full h-60 object-cover mb-4 rounded-lg"
+    <div className="p-4">
+      <NavigationButtons />
+      <Row gutter={16} className="lg:mt-8 md:mt-6 mt-4">
+        {/* Left Side: Service & Slot Details */}
+        <Col xs={24} lg={12}>
+          <Card
+            cover={
+              <img
+                src={selectedBooking.serviceImage}
+                alt={selectedBooking.serviceName}
+                style={{ objectFit: "cover", height: 300 }}
+              />
+            }
+          >
+            <Card.Meta
+              title={selectedBooking.serviceName}
+              description={
+                <>
+                  <div className="flex items-center">
+                    <FaDollarSign className="text-lg mr-2" />
+                    <span>Price: ${selectedBooking.price}</span>
+                  </div>
+                  <div className="flex items-center mt-2">
+                    <FaClock className="text-lg mr-2" />
+                    <span>Duration: {selectedBooking.duration} min</span>
+                  </div>
+                  <div className="mt-4">
+                    <strong>Selected Time:</strong> {selectedBooking.startTime}{" "}
+                    - {selectedBooking.endTime}
+                  </div>
+                </>
+              }
             />
-            <h3 className="text-2xl font-semibold mb-2">
-              {selectedService.name}
-            </h3>
-            <p className="text-lg mb-2">{selectedService.description}</p>
-            <div className="flex items-center space-x-4 mb-4">
-              <div className="flex items-center space-x-2 bg-blue-500 rounded-full py-2 px-4 text-white shadow-md">
-                <FaDollarSign className="text-xl" />
-                <span className="text-xl font-semibold">
-                  {selectedService.price}
-                </span>
-              </div>
-              <div className="flex items-center space-x-2 bg-blue-500 rounded-full py-2 px-4 text-white shadow-md">
-                <FaClock className="text-xl" />
-                <span className="text-xl font-semibold">
-                  {selectedService.duration}
-                </span>
-              </div>
-            </div>
-            <div className="bg-gray-100 p-4 rounded-lg mb-4">
-              <h4 className="text-xl font-semibold mb-2">Selected Time Slot</h4>
-              {selectedSlot ? (
-                <p>
-                  {selectedSlot.startTime} - {selectedSlot.endTime}
-                </p>
-              ) : (
-                <p>No slot selected</p>
-              )}
-            </div>
-          </div>
-        ) : (
-          <div className="text-center text-gray-500">No service selected</div>
-        )}
-      </div>
+          </Card>
+        </Col>
 
-      {/* Right Side: Booking Form */}
-      <div className="w-full lg:w-1/2 bg-white shadow-lg rounded-lg p-6 border border-gray-300">
-        <h2 className="text-3xl font-bold mb-4 border-b border-gray-200 pb-2">
-          Booking Details
-        </h2>
-        {user ? (
-          <Form layout="vertical">
-            <Form.Item label="Name" name="name" initialValue={user.name}>
-              <Input disabled />
-            </Form.Item>
-            <Form.Item label="Email" name="email" initialValue={user.email}>
-              <Input disabled />
-            </Form.Item>
-            <Form.Item className="mt-6">
-              <Button
-                type="primary"
-                onClick={handlePayment}
-                loading={isLoading}
-                className="w-full"
+        {/* Right Side: User Info & Payment Form */}
+        <Col xs={24} lg={12}>
+          <Card>
+            <h2 className="text-2xl font-bold mb-4">User Information</h2>
+            <Form
+              layout="vertical"
+              initialValues={userData}
+              onFinish={handleSubmit}
+            >
+              <Form.Item
+                label="User Name"
+                name="userName"
+                rules={[{ required: true, message: "Please enter your name" }]}
               >
-                {isLoading ? "Processing..." : "Confirm Booking"}
-              </Button>
-            </Form.Item>
-          </Form>
-        ) : (
-          <div className="text-center text-gray-500">
-            Please log in to complete your booking.
-          </div>
-        )}
-      </div>
+                <Input placeholder="Enter your name" />
+              </Form.Item>
+
+              <Form.Item
+                label="Email"
+                name="email"
+                rules={[
+                  { required: true, message: "Please enter your email" },
+                  { type: "email", message: "Please enter a valid email" },
+                ]}
+              >
+                <Input placeholder="Enter your email" />
+              </Form.Item>
+
+              <Form.Item
+                label="Vehicle Type"
+                name="vehicleType"
+                rules={[
+                  { required: true, message: "Please select a vehicle type" },
+                ]}
+              >
+                <Select
+                  placeholder="Select vehicle type"
+                  allowClear
+                >
+                  {vehicleTypeArray.map((type) => (
+                    <Select.Option key={type} value={type}>
+                      {type}
+                    </Select.Option>
+                  ))}
+                </Select>
+              </Form.Item>
+
+              <Form.Item
+                label="Vehicle Brand"
+                name="vehicleBrand"
+                rules={[
+                  { required: true, message: "Please enter vehicle brand" },
+                ]}
+              >
+                <Input placeholder="Enter vehicle brand" />
+              </Form.Item>
+
+              <Form.Item
+                label="Vehicle Model"
+                name="vehicleModel"
+                rules={[
+                  { required: true, message: "Please enter vehicle model" },
+                ]}
+              >
+                <Input placeholder="Enter vehicle model" />
+              </Form.Item>
+
+              <Form.Item
+                label="Manufacturing Year"
+                name="manufacturingYear"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please enter manufacturing year",
+                  },
+                ]}
+              >
+                <InputNumber
+                  placeholder="Enter year"
+                  min={1900}
+                  max={new Date().getFullYear()}
+                  style={{ width: "100%" }}
+                />
+              </Form.Item>
+
+              <Form.Item
+                label="Registration Plate"
+                name="registrationPlate"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please enter registration plate",
+                  },
+                ]}
+              >
+                <Input placeholder="Enter registration plate" />
+              </Form.Item>
+
+              <Form.Item>
+                <Button type="primary" htmlType="submit" block>
+                  Pay Now
+                </Button>
+              </Form.Item>
+            </Form>
+          </Card>
+        </Col>
+      </Row>
     </div>
   );
 };
