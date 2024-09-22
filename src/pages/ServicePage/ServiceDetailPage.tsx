@@ -17,7 +17,8 @@ const ServiceDetailPage: React.FC = () => {
   const dispatch = useDispatch();
 
   // Fetching service details
-  const { data: service, isLoading: serviceLoading } = useGetCarServiceByIdQuery(id);
+  const { data: service, isLoading: serviceLoading } =
+    useGetCarServiceByIdQuery(id);
 
   // Fetching available slots for the selected service and date
   const { data: slots, isLoading: slotsLoading } = useGetAllSlotsQuery({
@@ -27,6 +28,14 @@ const ServiceDetailPage: React.FC = () => {
 
   const serviceList = service?.data;
   const sloteList = slots?.data;
+
+  // * he take 3 day for solve this error finaly i solve it and thank you loop for debag that
+  if (sloteList) {
+    for (let i = 0; i < sloteList.length; i++) {
+      console.log(sloteList[i]._id, "slote id");
+      console.log(sloteList[i].service._id, "service id");
+    }
+  }
 
   if (serviceLoading || slotsLoading) return <LoadingPage />;
 
@@ -45,7 +54,7 @@ const ServiceDetailPage: React.FC = () => {
 
     // Dispatch the action to add the booking
     dispatch(addBookmark(serviceBookingData));
-    toast.success("Bookmark Successfully")
+    toast.success("Bookmark Successfully");
   };
 
   return (
@@ -70,17 +79,18 @@ const ServiceDetailPage: React.FC = () => {
                 <div className="flex items-center space-x-2 bg-blue-500 rounded-full py-2 px-4 text-white shadow-md">
                   <FaDollarSign className="text-xl" />
                   <div className="text-xl">
-                    <span className="font-semibold">Price:</span> {serviceList?.price}
+                    <span className="font-semibold">Price:</span>{" "}
+                    {serviceList?.price}
                   </div>
                 </div>
                 <div className="flex items-center space-x-2 bg-blue-500 rounded-full py-2 px-4 text-white shadow-md">
                   <FaClock className="text-xl" />
                   <div className="text-xl">
-                    <span className="font-semibold">Duration:</span> {serviceList?.duration}
+                    <span className="font-semibold">Duration:</span>{" "}
+                    {serviceList?.duration}
                   </div>
                 </div>
               </div>
-
               {/* Ant Design DatePicker */}
               <div className="my-4">
                 <h3 className="font-semibold text-xl mb-2">Select a Date:</h3>
@@ -91,23 +101,36 @@ const ServiceDetailPage: React.FC = () => {
                   className="p-2 border rounded-md"
                 />
               </div>
-
               {/* Slot Selection Section */}
+              {/* // Slot Selection Section */}
               <div className="my-4">
-                <h3 className="font-semibold text-xl mb-2">Available Time Slots:</h3>
+                <h3 className="font-semibold text-xl mb-2">
+                  Available Time Slots:
+                </h3>
                 <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
-                  {sloteList?.map((slot: any) => (
-                    <button
-                      key={slot._id}
-                      onClick={() => handleSlotSelect(slot)}
-                      className={`py-2 px-4 rounded-lg shadow-md transition-colors ${
-                        slot.isBooked === "booked" ? "bg-gray-300" : "bg-blue-500 text-white"
-                      } hover:bg-blue-600`}
-                      disabled={slot.isBooked === "booked"}
-                    >
-                      {slot.startTime} - {slot.endTime}
-                    </button>
-                  ))}
+                  {sloteList
+                    ?.filter(
+                      (slot: any) =>
+                        slot.service._id === serviceList._id &&
+                        slot.isBooked !== "booked"
+                    ) // Filter by service ID and booked status
+                    .map((slot: any) => (
+                      <button
+                        key={slot._id}
+                        onClick={() => handleSlotSelect(slot)}
+                        className="py-2 px-4 rounded-lg shadow-md bg-blue-500 text-white transition-colors hover:bg-blue-600"
+                      >
+                        {slot.startTime} - {slot.endTime}
+                      </button>
+                    ))}
+                  {/* Message when no available slots */}
+                  {sloteList?.filter(
+                    (slot: any) =>
+                      slot.service._id === serviceList._id &&
+                      slot.isBooked !== "booked"
+                  ).length === 0 && (
+                    <div>No available slots for this service.</div>
+                  )}
                 </div>
               </div>
             </div>

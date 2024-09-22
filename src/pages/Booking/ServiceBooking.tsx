@@ -39,7 +39,7 @@ const ServiceBooking: React.FC = () => {
     manufacturingYear: undefined,
     registrationPlate: "",
   });
-  
+
   console.log("User Data:", userData);
   const selectedBooking = allBookings[0];
 
@@ -74,17 +74,21 @@ const ServiceBooking: React.FC = () => {
       totalPrice: selectedBooking.price,
       userId: currentUser?._id,
     };
-  
-    console.log("Submitting Payment with Form Data:", formData); 
-  
+
+    console.log("Submitting Payment with Form Data:", formData);
+
     try {
       const paymentResponse = await makePayment(formData).unwrap();
       console.log("Payment successful:", paymentResponse);
+      if (paymentResponse.success) {
+        window.location.href = paymentResponse.data.payment_url;
+      }else{
+        console.error(error.message)
+      }
     } catch (error) {
       console.error("Payment failed:", error.data.message);
     }
   };
-  
 
   return (
     <div className="p-4">
@@ -154,7 +158,9 @@ const ServiceBooking: React.FC = () => {
               <Form.Item
                 label="Vehicle Type"
                 name="vehicleType"
-                rules={[{ required: true, message: "Please select a vehicle type" }]}
+                rules={[
+                  { required: true, message: "Please select a vehicle type" },
+                ]}
               >
                 <Select placeholder="Select vehicle type" allowClear>
                   {vehicleTypeArray.map((type) => (
@@ -168,7 +174,9 @@ const ServiceBooking: React.FC = () => {
               <Form.Item
                 label="Vehicle Brand"
                 name="vehicleBrand"
-                rules={[{ required: true, message: "Please enter vehicle brand" }]}
+                rules={[
+                  { required: true, message: "Please enter vehicle brand" },
+                ]}
               >
                 <Input placeholder="Enter vehicle brand" />
               </Form.Item>
@@ -176,7 +184,9 @@ const ServiceBooking: React.FC = () => {
               <Form.Item
                 label="Vehicle Model"
                 name="vehicleModel"
-                rules={[{ required: true, message: "Please enter vehicle model" }]}
+                rules={[
+                  { required: true, message: "Please enter vehicle model" },
+                ]}
               >
                 <Input placeholder="Enter vehicle model" />
               </Form.Item>
@@ -184,7 +194,12 @@ const ServiceBooking: React.FC = () => {
               <Form.Item
                 label="Manufacturing Year"
                 name="manufacturingYear"
-                rules={[{ required: true, message: "Please enter manufacturing year" }]}
+                rules={[
+                  {
+                    required: true,
+                    message: "Please enter manufacturing year",
+                  },
+                ]}
               >
                 <InputNumber
                   placeholder="Enter year"
@@ -197,7 +212,12 @@ const ServiceBooking: React.FC = () => {
               <Form.Item
                 label="Registration Plate"
                 name="registrationPlate"
-                rules={[{ required: true, message: "Please enter registration plate" }]}
+                rules={[
+                  {
+                    required: true,
+                    message: "Please enter registration plate",
+                  },
+                ]}
               >
                 <Input placeholder="Enter registration plate" />
               </Form.Item>
@@ -214,7 +234,9 @@ const ServiceBooking: React.FC = () => {
               </Form.Item>
 
               {isError && <div style={{ color: "red" }}>Payment failed</div>}
-              {isSuccess && <div style={{ color: "green" }}>Payment successful</div>}
+              {isSuccess && (
+                <div style={{ color: "green" }}>Payment successful</div>
+              )}
             </Form>
           </Card>
         </Col>
