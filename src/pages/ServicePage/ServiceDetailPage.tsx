@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { useGetCarServiceByIdQuery } from "../../redux/Api/services/serviceApi";
 import LoadingPage from "../Loading/LoadingPage";
@@ -11,51 +11,70 @@ import { useGetAllSlotsQuery } from "../../redux/Api/slot/slotApi";
 import { addBookmark } from "../../redux/features/auth/bookingSlice";
 import { toast } from "sonner";
 
+interface Image {
+  url: string; 
+  altText: string;
+}
+
+interface Service {
+  _id: string;
+  name: string;
+  description: string;
+  price: number;
+  duration: number;
+  isDeleted: boolean;
+  image?: Image;
+}
+
+interface Slot {
+  _id: string;
+  service: Service;
+  date: string;
+  startTime: string;
+  endTime: string;
+  isBooked?: "booked" | "";
+}
+
+
 const ServiceDetailPage: React.FC = () => {
+  const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
-  const [selectedDate, setSelectedDate] = useState<Moment>(moment());
+  const [selectedDate, setSelectedDate] = useState<Moment>(moment()); 
   const dispatch = useDispatch();
 
   // Fetching service details
-  const { data: service, isLoading: serviceLoading } =
+  const { data: serviceData, isLoading: serviceLoading } =
     useGetCarServiceByIdQuery(id);
+  const serviceList = serviceData?.data as Service; 
 
   // Fetching available slots for the selected service and date
-  const { data: slots, isLoading: slotsLoading } = useGetAllSlotsQuery({
+  const { data: slotsData, isLoading: slotsLoading } = useGetAllSlotsQuery({
     serviceId: id,
-    date: selectedDate.format("YYYY-MM-DD"),
+    date: selectedDate.format("YYYY-MM-DD"), 
   });
-
-  const serviceList = service?.data;
-  const sloteList = slots?.data;
-
-  // * he take 3 day for solve this error finaly i solve it and thank you loop for debag that
-  if (sloteList) {
-    for (let i = 0; i < sloteList.length; i++) {
-      console.log(sloteList[i]._id, "slote id");
-      console.log(sloteList[i].service._id, "service id");
-    }
-  }
-
-  if (serviceLoading || slotsLoading) return <LoadingPage />;
+  const sloteList = slotsData?.data as Slot[]; 
 
   // Handle Slot Selection and automatic booking
-  const handleSlotSelect = (slot: any) => {
+  const handleSlotSelect = (slot: Slot) => {
     const serviceBookingData = {
       serviceId: serviceList._id,
       slotId: slot._id,
       serviceName: serviceList.name,
-      serviceImage: serviceList.img || "",
+      serviceImage: serviceList.image?.url || "",
       duration: serviceList.duration,
       price: serviceList.price,
       startTime: slot.startTime,
       endTime: slot.endTime,
     };
+    console.log(serviceBookingData);
 
     // Dispatch the action to add the booking
     dispatch(addBookmark(serviceBookingData));
+    navigate("/booking", { state: { bookingData: serviceBookingData } });
     toast.success("Bookmark Successfully");
   };
+
+  if (serviceLoading || slotsLoading) return <LoadingPage />;
 
   return (
     <div className="container mx-auto p-4 lg:p-8">
@@ -65,15 +84,15 @@ const ServiceDetailPage: React.FC = () => {
           {/* Image Section */}
           <div className="w-full lg:w-1/2">
             <img
-              src={serviceList?.imageUrl}
-              alt="Service Image"
+               src={serviceList?.image?.url}
+               alt={serviceList?.image?.altText || "Service Image"}
               className="w-full h-80 object-cover"
             />
           </div>
           {/* Details Section */}
           <div className="w-full lg:w-1/2 p-6 flex flex-col justify-between">
             <div>
-              <h1 className="text-3xl font-bold mb-4">{serviceList?.name}</h1>
+              <h1 className="lg:text-3xl text-xl font-bold mb-4">{serviceList?.name}</h1>
               <p className="text-gray-700 mb-4">{serviceList?.description}</p>
               <div className="flex flex-col space-y-4 mb-6">
                 <div className="flex items-center space-x-2 bg-blue-500 rounded-full py-2 px-4 text-white shadow-md">
@@ -102,7 +121,6 @@ const ServiceDetailPage: React.FC = () => {
                 />
               </div>
               {/* Slot Selection Section */}
-              {/* // Slot Selection Section */}
               <div className="my-4">
                 <h3 className="font-semibold text-xl mb-2">
                   Available Time Slots:
@@ -110,11 +128,11 @@ const ServiceDetailPage: React.FC = () => {
                 <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
                   {sloteList
                     ?.filter(
-                      (slot: any) =>
+                      (slot: Slot) =>
                         slot.service._id === serviceList._id &&
                         slot.isBooked !== "booked"
-                    ) // Filter by service ID and booked status
-                    .map((slot: any) => (
+                    ) // Filter by service ID and availability
+                    .map((slot: Slot) => (
                       <button
                         key={slot._id}
                         onClick={() => handleSlotSelect(slot)}
@@ -125,11 +143,11 @@ const ServiceDetailPage: React.FC = () => {
                     ))}
                   {/* Message when no available slots */}
                   {sloteList?.filter(
-                    (slot: any) =>
+                    (slot: Slot) =>
                       slot.service._id === serviceList._id &&
                       slot.isBooked !== "booked"
                   ).length === 0 && (
-                    <div>No available slots for this service.</div>
+                    <div className="lg:text-2xl text-xl font-bold text-center">No available slots for this date.</div>
                   )}
                 </div>
               </div>

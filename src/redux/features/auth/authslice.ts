@@ -1,14 +1,24 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { RootState } from "../../store";
 
+type User = {
+  _id: string;
+  name: string;
+  email: string;
+  role?: "ADMIN" | "USER";
+  phone?: string;
+  address?: string;
+  profilePicture?:string;
+};
+
 type TAuthState = {
-  user: null | object;
+  user: User | null;
   token: null | string;
   role?: string | null;
 };
 const initialState: TAuthState = {
   user: null,
-  token: null
+  token: null,
 };
 
 const authSlice = createSlice({

@@ -1,48 +1,37 @@
-import React from 'react';
 import { Table } from 'antd';
-
-// Dummy data for past bookings
-const pastBookings = [
-  {
-    id: '1',
-    serviceName: 'Service A',
-    date: '2024-09-01',
-    time: '10:00 AM',
-    status: 'Completed',
-  },
-  {
-    id: '2',
-    serviceName: 'Service B',
-    date: '2024-09-05',
-    time: '11:00 AM',
-    status: 'Completed',
-  },
-  {
-    id: '3',
-    serviceName: 'Service C',
-    date: '2024-09-10',
-    time: '02:00 PM',
-    status: 'Completed',
-  },
-  // Add more dummy data as needed
-];
+import { useGetAllOrdersQuery } from '../../../redux/Api/orderApi/orderApi';
+import { useAppSelector } from '../../../redux/hooks';
+import { useCurrentUser } from '../../../redux/features/auth/authslice';
+import LoadingPage from '../../../pages/Loading/LoadingPage';
+import { Booking } from '../../../types/UpcommingTypes/Upcomming.Types';
 
 const PastBookings: React.FC = () => {
-  // Define columns for the table
+  const { data: bookings, isLoading } = useGetAllOrdersQuery(undefined);
+  const currentUser = useAppSelector(useCurrentUser);
+
+  // Filter bookings based on the current user
+  const pastBookings = bookings?.data?.filter(
+    (booking: Booking) => booking.user.email === currentUser?.email
+  );
+
+  if (isLoading) return <LoadingPage />;
+
   const columns = [
     {
       title: 'Service Name',
-      dataIndex: 'serviceName',
+      dataIndex: ['serviceDetails', 'serviceName'], 
       key: 'serviceName',
     },
     {
       title: 'Date',
-      dataIndex: 'date',
+      dataIndex: ['serviceDetails', 'startTime'], 
       key: 'date',
     },
     {
       title: 'Time',
-      dataIndex: 'time',
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      render: (_: any, record: Booking) =>
+        `${record.serviceDetails.startTime} - ${record.serviceDetails.endTime}`, 
       key: 'time',
     },
     {
@@ -54,10 +43,13 @@ const PastBookings: React.FC = () => {
 
   return (
     <Table
-      dataSource={pastBookings}
+      dataSource={pastBookings?.map((booking: Booking) => ({
+        ...booking,
+        key: booking._id, // Assigning _id as row key
+      }))}
       columns={columns}
       rowKey="id"
-      pagination={{ pageSize: 10 }} // Adjust pagination as needed
+      pagination={{ pageSize: 10 }}
     />
   );
 };

@@ -1,11 +1,11 @@
-import React, { useState } from "react";
 import { useAppSelector } from "../../redux/hooks";
-import { getAllSlotBooking } from "../../redux/features/auth/bookingSlice";
 import { FaClock, FaDollarSign } from "react-icons/fa";
 import { useCurrentUser } from "../../redux/features/auth/authslice";
 import { Form, Input, Button, InputNumber, Row, Col, Card, Select } from "antd";
 import NavigationButtons from "../../shared/NavigationButtons/NavigationButtons";
 import { useMakePaymentMutation } from "../../redux/Api/paymentApi/paymentApi";
+import { toast } from "sonner";
+import { getSlotBookmark } from "../../redux/features/auth/bookingSlice";
 
 // Vehicle types array
 export const vehicleTypeArray = [
@@ -22,37 +22,22 @@ export const vehicleTypeArray = [
 ] as const;
 
 const ServiceBooking: React.FC = () => {
-  const allBookings = useAppSelector(getAllSlotBooking);
+  const myBooking = useAppSelector(getSlotBookmark);
   const currentUser = useAppSelector(useCurrentUser);
-
-  const [makePayment, { isLoading, isSuccess, isError }] =
-    useMakePaymentMutation();
-
-  const [userData, setUserData] = useState({
-    userName: currentUser?.name,
-    email: currentUser?.email,
-    address: currentUser?.address,
-    phone: currentUser?.phone,
-    vehicleType: "",
-    vehicleBrand: "",
-    vehicleModel: "",
-    manufacturingYear: undefined,
-    registrationPlate: "",
-  });
-
-  console.log("User Data:", userData);
-  const selectedBooking = allBookings[0];
+  const [makePayment, { isLoading }] = useMakePaymentMutation();
+  const [form] = Form.useForm();
+  console.log(myBooking);
+  const selectedBooking = myBooking;
 
   if (!selectedBooking) {
-    console.log("No booking found.");
     return <div>No booking found.</div>;
   }
 
   const handleSubmit = async (values: any) => {
     const formData = {
       user: {
-        name: values.userName,
-        email: values.email,
+        name: currentUser?.name,
+        email: currentUser?.email,
         phone: currentUser?.phone,
         address: currentUser?.address,
       },
@@ -66,27 +51,24 @@ const ServiceBooking: React.FC = () => {
       serviceDetails: {
         serviceId: selectedBooking._id,
         serviceName: selectedBooking.serviceName,
-        startTime: selectedBooking.startTime,
-        endTime: selectedBooking.endTime,
-        duration: selectedBooking.duration,
+        startTime: values.startTime || selectedBooking.startTime,
+        endTime: values.endTime || selectedBooking.endTime,
+        duration: values.duration || selectedBooking.duration,
         price: selectedBooking.price,
       },
       totalPrice: selectedBooking.price,
       userId: currentUser?._id,
     };
 
-    console.log("Submitting Payment with Form Data:", formData);
-
     try {
       const paymentResponse = await makePayment(formData).unwrap();
-      console.log("Payment successful:", paymentResponse);
       if (paymentResponse.success) {
         window.location.href = paymentResponse.data.payment_url;
-      }else{
-        console.error(error.message)
       }
+      toast.success("Payment successful! Redirecting...");
     } catch (error) {
       console.error("Payment failed:", error.data.message);
+      toast.error("Payment failed: " + error.data.message);
     }
   };
 
@@ -131,28 +113,13 @@ const ServiceBooking: React.FC = () => {
         <Col xs={24} lg={12}>
           <Card>
             <h2 className="text-2xl font-bold mb-4">User Information</h2>
-            <Form
-              layout="vertical"
-              initialValues={userData}
-              onFinish={handleSubmit}
-            >
-              <Form.Item
-                label="User Name"
-                name="userName"
-                rules={[{ required: true, message: "Please enter your name" }]}
-              >
-                <Input placeholder="Enter your name" />
+            <Form form={form} layout="vertical" onFinish={handleSubmit}>
+              <Form.Item label="User Name">
+                <Input value={currentUser?.name} disabled />
               </Form.Item>
 
-              <Form.Item
-                label="Email"
-                name="email"
-                rules={[
-                  { required: true, message: "Please enter your email" },
-                  { type: "email", message: "Please enter a valid email" },
-                ]}
-              >
-                <Input placeholder="Enter your email" />
+              <Form.Item label="Email">
+                <Input value={currentUser?.email} disabled />
               </Form.Item>
 
               <Form.Item
@@ -221,7 +188,6 @@ const ServiceBooking: React.FC = () => {
               >
                 <Input placeholder="Enter registration plate" />
               </Form.Item>
-
               <Form.Item>
                 <Button
                   type="primary"
@@ -232,11 +198,6 @@ const ServiceBooking: React.FC = () => {
                   {isLoading ? "Processing..." : "Pay Now"}
                 </Button>
               </Form.Item>
-
-              {isError && <div style={{ color: "red" }}>Payment failed</div>}
-              {isSuccess && (
-                <div style={{ color: "green" }}>Payment successful</div>
-              )}
             </Form>
           </Card>
         </Col>

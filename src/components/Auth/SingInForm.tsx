@@ -35,7 +35,7 @@ const SingInForm = () => {
         dispatch(setUser( userData ));
 
         toast.success("User logged in successfully!");
-        navigate("/");
+        navigate("/dashboard/me");
       } else {
         toast.error(res.message || "Sign in failed.");
       }

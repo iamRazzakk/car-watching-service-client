@@ -1,58 +1,59 @@
-import React from 'react';
 import { Card, Col, Row, Typography } from 'antd';
+import Countdown, { CountdownRendererFn } from 'react-countdown';
+import { useGetAllOrdersQuery } from '../../../redux/Api/orderApi/orderApi';
+import { useAppSelector } from '../../../redux/hooks';
+import { useCurrentUser } from '../../../redux/features/auth/authslice';
 import moment from 'moment';
+import LoadingPage from '../../../pages/Loading/LoadingPage';
+import { Booking } from '../../../types/UpcommingTypes/Upcomming.Types';
 
-// Dummy data for upcoming bookings
-const upcomingBookings = [
-  {
-    id: '1',
-    serviceName: 'Service A',
-    date: '2024-09-20',
-    time: '10:00 AM',
-    status: 'Upcoming',
-    countdownEnd: new Date('2024-09-20T10:00:00'), // Use a future date for countdown
-  },
-  {
-    id: '2',
-    serviceName: 'Service B',
-    date: '2024-09-25',
-    time: '11:00 AM',
-    status: 'Upcoming',
-    countdownEnd: new Date('2024-09-25T11:00:00'),
-  },
-  {
-    id: '3',
-    serviceName: 'Service C',
-    date: '2024-09-30',
-    time: '02:00 PM',
-    status: 'Upcoming',
-    countdownEnd: new Date('2024-09-30T14:00:00'),
-  },
-  // Add more dummy data as needed
-];
-
+// Use the defined types
 const { Title } = Typography;
 
 const UpcomingBookings: React.FC = () => {
-  // Function to get countdown time
-  const getCountdown = (endDate: Date) => {
-    const duration = moment.duration(moment(endDate).diff(moment()));
-    return `${Math.floor(duration.asDays())} days ${duration.hours()} hours ${duration.minutes()} minutes`;
+  const { data: bookings, isLoading } = useGetAllOrdersQuery(undefined);
+  const currentUser = useAppSelector(useCurrentUser);
+
+  if (isLoading) return <LoadingPage />;
+
+  // Filter upcoming bookings (based on user and booking date)
+  const upcomingBookings = bookings?.data?.filter((booking:Booking) => {
+    const bookingDateTime = moment(`${booking.date}T${booking.time}`, "YYYY-MM-DDTHH:mm");
+    return moment().isBefore(bookingDateTime) && booking.user._id === currentUser?._id;
+  });
+
+  // Custom countdown renderer
+  const countdownRenderer: CountdownRendererFn = ({ days, hours, minutes, seconds, completed }) => {
+    if (completed) {
+      return <span>Booking time has passed!</span>;
+    }
+    return (
+      <span>
+        {days} days {hours} hours {minutes} minutes {seconds} seconds
+      </span>
+    );
   };
 
   return (
     <Row gutter={16}>
-      {upcomingBookings.map((booking) => (
-        <Col span={8} key={booking.id}>
-          <Card title={`Service: ${booking.serviceName}`}>
-            <p>Date: {booking.date}</p>
-            <p>Time: {booking.time}</p>
-            <p>Status: {booking.status}</p>
-            <Title level={4}>Countdown:</Title>
-            <p>{getCountdown(booking.countdownEnd)}</p>
-          </Card>
-        </Col>
-      ))}
+      {upcomingBookings?.length > 0 ? (
+        upcomingBookings.map((booking:Booking) => (
+          <Col span={8} key={booking._id}>
+            <Card title={`Service: ${booking.serviceDetails.serviceName}`}>
+              <p>Date: {booking.date}</p>
+              <p>Time: {booking.serviceDetails.startTime} - {booking.serviceDetails.endTime}</p>
+              <p>Status: {booking.status}</p>
+              <Title level={4}>Countdown:</Title>
+              <Countdown
+                date={moment(`${booking.date}T${booking.serviceDetails.startTime}`).toDate()}
+                renderer={countdownRenderer}
+              />
+            </Card>
+          </Col>
+        ))
+      ) : (
+        <p>No upcoming bookings found</p>
+      )}
     </Row>
   );
 };

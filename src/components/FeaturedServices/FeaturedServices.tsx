@@ -8,7 +8,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import Title from "../../shared/Title/Title";
 const FeaturedServices = () => {
-  const { data: Services, isLoading } = useGetAllCarServicesQuery();
+  const { data: Services, isLoading } = useGetAllCarServicesQuery(undefined);
   if (isLoading) return <LoadingPage />;
   return (
     <div className="lg:p-6 md:p-4 p-3">

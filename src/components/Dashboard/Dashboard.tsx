@@ -12,8 +12,16 @@ import { useCurrentUser } from "../../redux/features/auth/authslice";
 
 const { Header, Content, Sider } = Layout;
 
-// Define the menu items with sub-navigation
-const adminMenuItems = [
+// Define the type for menu items
+type MenuItem = {
+  key: string;
+  icon: React.ReactNode;
+  label: string;
+  path?: string;
+  children?: MenuItem[];
+};
+
+const adminMenuItems: MenuItem[] = [
   {
     key: "profile",
     icon: <UserOutlined />,
@@ -79,7 +87,7 @@ const adminMenuItems = [
   },
 ];
 
-const userMenuItems = [
+const userMenuItems: MenuItem[] = [
   {
     key: "profile",
     icon: <UserOutlined />,
@@ -87,21 +95,15 @@ const userMenuItems = [
     path: "me",
   },
   {
-    key: "C.Service-bookings",
-    icon: <UserOutlined />,
-    label: "C.Service-bookings",
-    path: "create-bookings",
-  },
-  {
     key: "past-bookings",
     icon: <UserOutlined />,
-    label: "Past-bookings",
+    label: "Past Bookings",
     path: "past-bookings",
   },
   {
     key: "upcoming-bookings",
     icon: <UserOutlined />,
-    label: "Upcoming-bookings",
+    label: "Upcoming Bookings",
     path: "upcoming-bookings",
   },
   {
@@ -117,15 +119,16 @@ const Dashboard: React.FC = () => {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
   const navigate = useNavigate();
-  const currentUser = useAppSelector(useCurrentUser);
+  const currentUser = useAppSelector(useCurrentUser) ;
 
   // Determine if the user is an admin
   const isAdmin = currentUser?.role === 'ADMIN';
 
   // Filter menu items based on the user role
-  const menuItems = isAdmin ? adminMenuItems : userMenuItems;
+  const menuItems: MenuItem[] = isAdmin ? adminMenuItems : userMenuItems;
 
   // Handle navigation on menu item click
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleMenuClick = (menuInfo: any) => {
     const clickedItem = menuItems.find(item =>
       item.key === menuInfo.key || item.children?.find(child => child.key === menuInfo.key)

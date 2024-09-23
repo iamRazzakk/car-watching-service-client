@@ -1,36 +1,51 @@
-// src/components/ViewUserBookings/ViewUserBookings.tsx
 import { Table } from "antd";
-import { useGetUserBookingsQuery } from "../../../redux/Api/bookingService/bookingServiceApi";
 import LoadingPage from "../../../pages/Loading/LoadingPage";
+import { useGetAllOrdersQuery } from "../../../redux/Api/orderApi/orderApi";
 
 const ViewUserBookings = () => {
-  const { data: bookings, isLoading } = useGetUserBookingsQuery(undefined);
+  const { data: bookings, isLoading } = useGetAllOrdersQuery(undefined);
 
+  // If bookings or bookings.data does not exist, handle the case properly
   if (isLoading) return <LoadingPage />;
+  if (!bookings || !bookings.data) return <div>No bookings found.</div>;
 
   const columns = [
     {
-      title: "Service Name",
-      dataIndex: "serviceId",
-      key: "serviceId",
-      render: (serviceId: any) => serviceId?.name || "N/A",
+      title: "Customer Name",
+      dataIndex: ["user", "name"], 
+      key: "userName",
     },
     {
-      title: "Slot Date",
-      dataIndex: "slotId",
-      key: "slotId",
-      render: (slotId: any) => slotId?.date || "N/A",
+      title: "Vehicle Type",
+      dataIndex: ["vehicleDetails", "vehicleType"],
+      key: "vehicleType",
+    },
+    {
+      title: "Service Name",
+      dataIndex: ["serviceDetails", "serviceName"],
+      key: "serviceName",
+    },
+    {
+      title: "$ Price",
+      dataIndex: ["serviceDetails", "price"],
+      key: "price",
     },
     {
       title: "Slot Time",
-      dataIndex: "slotId",
-      key: "slotId",
-      render: (slotId: any) => `${slotId?.startTime} - ${slotId?.endTime}`,
+      key: "slotTime",
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      render: (_: any, record: any) =>
+        `${record.serviceDetails.startTime} - ${record.serviceDetails.endTime}`,
     },
     {
       title: "Status",
       dataIndex: "status",
       key: "status",
+    },
+    {
+      title: "Payment Status",
+      dataIndex: "paymentStatus",
+      key: "paymentStatus",
     },
   ];
 
@@ -38,9 +53,10 @@ const ViewUserBookings = () => {
     <div>
       <Table
         columns={columns}
-        dataSource={bookings?.data?.map((booking: any) => ({
-          ...booking,
-          key: booking._id,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        dataSource={bookings.data.map((order: any) => ({
+          ...order,
+          key: order._id,
         }))}
         pagination={{ pageSize: 10 }}
       />

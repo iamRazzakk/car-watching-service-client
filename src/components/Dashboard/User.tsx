@@ -19,13 +19,19 @@ import {
   useChangePasswordMutation,
   useUploadProfilePictureMutation,
 } from "../../redux/Api/AuthApi/authApi";
-
+interface UserFormValues {
+  name: string;
+  email: string;
+  phone: string;
+  address: string;
+  password?: string;
+}
 const { Title, Text } = Typography;
 
 const User: React.FC = () => {
   const user = useAppSelector(useCurrentUser);
   const [isEditing, setIsEditing] = useState(false);
-  const [form] = Form.useForm();
+  const [form] = Form.useForm<UserFormValues>();
 
   // Upload mutation
   const [uploadProfilePicture] = useUploadProfilePictureMutation();
@@ -43,18 +49,30 @@ const User: React.FC = () => {
   };
 
   // Handle form submit
-  const handleSave = async (values: any) => {
+  const handleSave = async (values: UserFormValues) => {
     try {
       // Handle password change if applicable
       if (values.password) {
-        await changePassword({ oldPassword: "", newPassword: values.password }); // Replace '' with old password
+        await changePassword({ oldPassword: "", newPassword: values.password });
       }
 
-      // Handle user profile update
-      await uploadProfilePicture(new FormData(document.querySelector("form"))); // Adjust as needed
+      // Get the form element
+      const formElement = document.querySelector(
+        "form"
+      ) as HTMLFormElement | null;
 
-      message.success("Profile updated successfully");
-      setIsEditing(false);
+      if (formElement) {
+        const formData = new FormData(formElement);
+
+        // Handle user profile picture upload
+        await uploadProfilePicture(formData).unwrap();
+
+        message.success("Profile updated successfully");
+        setIsEditing(false);
+      } else {
+        message.error("Failed to find the form element.");
+      }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       message.error("Failed to update profile");
     }

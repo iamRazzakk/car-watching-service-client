@@ -1,7 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "../../store";
 
-
 export type TSlotBookmark = {
   serviceId: string;
   slotId: string;
@@ -14,11 +13,11 @@ export type TSlotBookmark = {
 };
 
 type SlotBookmarkState = {
-  bookmarks: TSlotBookmark[];
+  bookmark: TSlotBookmark | null; // Store a single bookmark
 };
 
 const initialState: SlotBookmarkState = {
-  bookmarks: [],
+  bookmark: null, // Initially, no bookmark is selected
 };
 
 const slotBookmarkSlice = createSlice({
@@ -26,20 +25,13 @@ const slotBookmarkSlice = createSlice({
   initialState,
   reducers: {
     addBookmark: (state, action: PayloadAction<TSlotBookmark>) => {
-      const bookmarkExists = state.bookmarks.some(
-        (bookmark) => bookmark.slotId === action.payload.slotId
-      );
-      if (!bookmarkExists) {
-        state.bookmarks.push(action.payload);
-      }
+      state.bookmark = action.payload; // Add a single bookmark
     },
-    removeBookmark: (state, action: PayloadAction<string>) => {
-      state.bookmarks = state.bookmarks.filter(
-        (bookmark) => bookmark.slotId !== action.payload
-      );
+    removeBookmark: (state) => {
+      state.bookmark = null; // Clear the bookmark
     },
     clearBookmarks: (state) => {
-      state.bookmarks = [];
+      state.bookmark = null; // Clear the bookmark
     },
   },
 });
@@ -48,5 +40,5 @@ export const { addBookmark, removeBookmark, clearBookmarks } =
   slotBookmarkSlice.actions;
 export default slotBookmarkSlice.reducer;
 
-export const getAllSlotBooking = (state: RootState) =>
-  state.slotBookmarks.bookmarks;
+// Selector to get the single slot bookmark
+export const getSlotBookmark = (state: RootState) => state.slotBookmarks.bookmark;
