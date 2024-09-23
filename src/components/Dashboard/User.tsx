@@ -15,75 +15,56 @@ import {
 import { UploadOutlined, EditOutlined, SaveOutlined } from "@ant-design/icons";
 import { useAppSelector } from "../../redux/hooks";
 import { useCurrentUser } from "../../redux/features/auth/authslice";
-import {
-  useChangePasswordMutation,
-  useUploadProfilePictureMutation,
-} from "../../redux/Api/AuthApi/authApi";
-interface UserFormValues {
-  name: string;
-  email: string;
-  phone: string;
-  address: string;
-  password?: string;
+import { useChangePasswordMutation } from "../../redux/Api/AuthApi/authApi";
+
+interface PasswordFormValues {
+  oldPassword: string;
+  newPassword: string;
+  confirmPassword: string;
 }
+
 const { Title, Text } = Typography;
 
 const User: React.FC = () => {
   const user = useAppSelector(useCurrentUser);
   const [isEditing, setIsEditing] = useState(false);
-  const [form] = Form.useForm<UserFormValues>();
+  const [form] = Form.useForm<PasswordFormValues>();
 
-  // Upload mutation
-  const [uploadProfilePicture] = useUploadProfilePictureMutation();
+  // Password change mutation from RTK query
   const [changePassword] = useChangePasswordMutation();
 
-  // Show modal for editing user details
-  const showEditModal = () => {
-    form.setFieldsValue({
-      name: user?.name,
-      email: user?.email,
-      phone: user?.phone,
-      address: user?.address,
-    });
+  // Show modal for editing user details (for password change)
+  const showPasswordModal = () => {
+    form.resetFields(); // Clear the form before showing the modal
     setIsEditing(true);
   };
 
-  // Handle form submit
-  const handleSave = async (values: UserFormValues) => {
+  // Handle password change form submission
+  const handleSavePassword = async (values: PasswordFormValues) => {
     try {
-      // Handle password change if applicable
-      if (values.password) {
-        await changePassword({ oldPassword: "", newPassword: values.password });
-      }
+      // Call the changePassword mutation with the form values
+      await changePassword({
+        email: user?.email || "", // User's email from the state
+        oldPassword: values.oldPassword, // Old password input
+        newPassword: values.newPassword, // New password input
+      }).unwrap();
 
-      // Get the form element
-      const formElement = document.querySelector(
-        "form"
-      ) as HTMLFormElement | null;
-
-      if (formElement) {
-        const formData = new FormData(formElement);
-
-        // Handle user profile picture upload
-        await uploadProfilePicture(formData).unwrap();
-
-        message.success("Profile updated successfully");
-        setIsEditing(false);
-      } else {
-        message.error("Failed to find the form element.");
-      }
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      // Success feedback
+      message.success("Password changed successfully");
+      form.resetFields(); // Reset the form after successful submission
+      setIsEditing(false); // Close the modal
     } catch (error) {
-      message.error("Failed to update profile");
+      // Error feedback
+      message.error("Failed to change password. Please try again.");
     }
   };
 
-  // Upload change handler
+  // Handle profile image upload (optional)
   const handleUploadChange = async (info: any) => {
     if (info.file.status === "done") {
-      message.success(`${info.file.name} file uploaded successfully`);
+      message.success(`${info.file.name} uploaded successfully`);
     } else if (info.file.status === "error") {
-      message.error(`${info.file.name} file upload failed.`);
+      message.error(`${info.file.name} upload failed.`);
     }
   };
 
@@ -94,10 +75,10 @@ const User: React.FC = () => {
         extra={
           <Button
             icon={<EditOutlined />}
-            onClick={showEditModal}
+            onClick={showPasswordModal}
             type="primary"
           >
-            Edit
+            Change Password
           </Button>
         }
         style={{ width: "100%", maxWidth: "800px", margin: "0 auto" }}
@@ -114,7 +95,6 @@ const User: React.FC = () => {
               showUploadList={false}
               action="http://localhost:5000/api/auth/users/profile"
               onChange={handleUploadChange}
-              // headers={{ Authorization: `Bearer ${yourAuthToken}` }}
             >
               <Button icon={<UploadOutlined />}>Change Picture</Button>
             </Upload>
@@ -132,61 +112,67 @@ const User: React.FC = () => {
         </Row>
       </Card>
 
-      {/* Edit Modal */}
+      {/* Change Password Modal */}
       <Modal
-        title="Edit Profile"
+        title="Change Password"
         visible={isEditing}
         onCancel={() => setIsEditing(false)}
         footer={null}
-        width={600}
+        width={400}
       >
-        <Form
-          form={form}
-          layout="vertical"
-          onFinish={handleSave}
-          initialValues={{
-            name: user?.name,
-            email: user?.email,
-            phone: user?.phone,
-            address: user?.address,
-          }}
-        >
+        <Form form={form} layout="vertical" onFinish={handleSavePassword}>
+          {/* Old Password Input */}
           <Form.Item
-            label="Name"
-            name="name"
-            rules={[{ required: true, message: "Please input your name!" }]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            label="Email"
-            name="email"
-            rules={[{ required: true, message: "Please input your email!" }]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            label="Phone"
-            name="phone"
+            label="Old Password"
+            name="oldPassword"
             rules={[
-              { required: true, message: "Please input your phone number!" },
+              { required: true, message: "Please input your old password!" },
             ]}
+            hasFeedback
           >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            label="Address"
-            name="address"
-            rules={[{ required: true, message: "Please input your address!" }]}
-          >
-            <Input.TextArea rows={4} />
-          </Form.Item>
-          <Form.Item label="New Password" name="password">
             <Input.Password />
           </Form.Item>
+
+          {/* New Password Input */}
+          <Form.Item
+            label="New Password"
+            name="newPassword"
+            rules={[
+              { required: true, message: "Please input your new password!" },
+              { min: 8, message: "Password must be at least 8 characters long" },
+            ]}
+            hasFeedback
+          >
+            <Input.Password />
+          </Form.Item>
+
+          {/* Confirm Password Input */}
+          <Form.Item
+            label="Confirm Password"
+            name="confirmPassword"
+            dependencies={["newPassword"]}
+            hasFeedback
+            rules={[
+              { required: true, message: "Please confirm your new password!" },
+              ({ getFieldValue }) => ({
+                validator(_, value) {
+                  if (!value || getFieldValue("newPassword") === value) {
+                    return Promise.resolve();
+                  }
+                  return Promise.reject(
+                    new Error("The two passwords you entered do not match!")
+                  );
+                },
+              }),
+            ]}
+          >
+            <Input.Password />
+          </Form.Item>
+
+          {/* Submit Button */}
           <Form.Item>
             <Button type="primary" htmlType="submit" icon={<SaveOutlined />}>
-              Save Changes
+              Save Password
             </Button>
           </Form.Item>
         </Form>

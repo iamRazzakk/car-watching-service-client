@@ -5,23 +5,23 @@ import { baseApi } from "../baseApi";
 const authApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     // Endpoint for uploading a profile picture
-    uploadProfilePicture: builder.mutation<UserProfile, FormData>({
-      query: (formData) => ({
-        url: '/users/profile',
-        method: 'PATCH',
-        body: formData,
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      }),
-      // Define how the cache should be managed if needed
-      invalidatesTags: ['User'],
-    }),
+    // uploadProfilePicture: builder.mutation<UserProfile, FormData>({
+    //   query: (formData) => ({
+    //     url: '/users/profile',
+    //     method: 'PATCH',
+    //     body: formData,
+    //     headers: {
+    //       'Content-Type': 'multipart/form-data',
+    //     },
+    //   }),
+    //   // Define how the cache should be managed if needed
+    //   invalidatesTags: ['User'],
+    // }),
     // Endpoint for changing the password
     changePassword: builder.mutation<void, UserPasswordUpdate>({
       query: (data) => ({
-        url: '/users/password',
-        method: 'PATCH',
+        url: '/auth/change-password',
+        method: 'POST',
         body: data,
       }),
       // Define how the cache should be managed if needed
@@ -30,4 +30,4 @@ const authApi = baseApi.injectEndpoints({
   }),
 });
 
-export const { useUploadProfilePictureMutation, useChangePasswordMutation } = authApi;
+export const {  useChangePasswordMutation } = authApi;
