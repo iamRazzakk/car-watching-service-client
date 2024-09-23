@@ -9,9 +9,16 @@ const reviewApi = baseApi.injectEndpoints({
         body: reviewData,
       }),
     }),
+    getAllReview: builder.query({
+      query: (reviewData) => ({
+        url: "/review",
+        method: "GET",
+        body: reviewData,
+      }),
+    }),
   }),
 });
 
-export const { useCreateReviewMutation } = reviewApi;
+export const { useCreateReviewMutation, useGetAllReviewQuery } = reviewApi;
 
 export default reviewApi;
