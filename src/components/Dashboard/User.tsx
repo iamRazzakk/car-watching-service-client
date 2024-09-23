@@ -10,12 +10,15 @@ import {
   Form,
   Input,
   Upload,
-  message,
 } from "antd";
 import { UploadOutlined, EditOutlined, SaveOutlined } from "@ant-design/icons";
 import { useAppSelector } from "../../redux/hooks";
 import { useCurrentUser } from "../../redux/features/auth/authslice";
-import { useChangePasswordMutation } from "../../redux/Api/AuthApi/authApi";
+import {
+  useChangePasswordMutation,
+  useUploadProfilePictureMutation,
+} from "../../redux/Api/AuthApi/authApi";
+import { toast } from "sonner";
 
 interface PasswordFormValues {
   oldPassword: string;
@@ -33,38 +36,48 @@ const User: React.FC = () => {
   // Password change mutation from RTK query
   const [changePassword] = useChangePasswordMutation();
 
-  // Show modal for editing user details (for password change)
+  // Profile picture upload mutation from RTK query
+  const [uploadProfilePicture] = useUploadProfilePictureMutation();
+
   const showPasswordModal = () => {
-    form.resetFields(); // Clear the form before showing the modal
+    form.resetFields();
     setIsEditing(true);
   };
 
-  // Handle password change form submission
   const handleSavePassword = async (values: PasswordFormValues) => {
     try {
-      // Call the changePassword mutation with the form values
       await changePassword({
-        email: user?.email || "", // User's email from the state
-        oldPassword: values.oldPassword, // Old password input
-        newPassword: values.newPassword, // New password input
+        email: user?.email || "",
+        oldPassword: values.oldPassword,
+        newPassword: values.newPassword,
       }).unwrap();
 
-      // Success feedback
-      message.success("Password changed successfully");
-      form.resetFields(); // Reset the form after successful submission
-      setIsEditing(false); // Close the modal
+      toast.success("Password changed successfully");
+      form.resetFields();
+      setIsEditing(false);
     } catch (error) {
-      // Error feedback
-      message.error("Failed to change password. Please try again.");
+      toast.error("Failed to change password. Please try again.");
     }
   };
 
-  // Handle profile image upload (optional)
   const handleUploadChange = async (info: any) => {
     if (info.file.status === "done") {
-      message.success(`${info.file.name} uploaded successfully`);
+      // File uploaded successfully
+      toast.success(`${info.file.name} uploaded successfully`);
     } else if (info.file.status === "error") {
-      message.error(`${info.file.name} upload failed.`);
+      // File upload failed
+      toast.error(`${info.file.name} upload failed.`);
+    }
+  };
+  const handleProfilePictureChange = async (file: any) => {
+    const formData = new FormData();
+    formData.append("profilePicture", file);
+
+    try {
+      await uploadProfilePicture(formData).unwrap();
+      toast.success("Profile picture uploaded successfully");
+    } catch (error) {
+      toast.error("Failed to upload profile picture. Please try again.");
     }
   };
 
@@ -91,9 +104,9 @@ const User: React.FC = () => {
               style={{ marginBottom: "16px" }}
             />
             <Upload
-              name="profilePicture"
+              name="avatar" // This should match the name expected by the backend
               showUploadList={false}
-              action="http://localhost:5000/api/auth/users/profile"
+              action="http://localhost:5000/api/auth/upload-avatar" 
               onChange={handleUploadChange}
             >
               <Button icon={<UploadOutlined />}>Change Picture</Button>
@@ -121,7 +134,6 @@ const User: React.FC = () => {
         width={400}
       >
         <Form form={form} layout="vertical" onFinish={handleSavePassword}>
-          {/* Old Password Input */}
           <Form.Item
             label="Old Password"
             name="oldPassword"
@@ -133,20 +145,21 @@ const User: React.FC = () => {
             <Input.Password />
           </Form.Item>
 
-          {/* New Password Input */}
           <Form.Item
             label="New Password"
             name="newPassword"
             rules={[
               { required: true, message: "Please input your new password!" },
-              { min: 8, message: "Password must be at least 8 characters long" },
+              {
+                min: 8,
+                message: "Password must be at least 8 characters long",
+              },
             ]}
             hasFeedback
           >
             <Input.Password />
           </Form.Item>
 
-          {/* Confirm Password Input */}
           <Form.Item
             label="Confirm Password"
             name="confirmPassword"
@@ -160,7 +173,7 @@ const User: React.FC = () => {
                     return Promise.resolve();
                   }
                   return Promise.reject(
-                    new Error("The two passwords you entered do not match!")
+                    new Error("The two passwords do not match!")
                   );
                 },
               }),
@@ -169,7 +182,6 @@ const User: React.FC = () => {
             <Input.Password />
           </Form.Item>
 
-          {/* Submit Button */}
           <Form.Item>
             <Button type="primary" htmlType="submit" icon={<SaveOutlined />}>
               Save Password
