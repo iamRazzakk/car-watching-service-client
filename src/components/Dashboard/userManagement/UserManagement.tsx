@@ -5,7 +5,7 @@ import { useGetAllUsersQuery, useUserUpdateRoleMutation } from '../../../redux/f
 const { Option } = Select;
 
 const UserManagement = () => {
-  const { data, refetch } = useGetAllUsersQuery(); 
+  const { data, refetch } = useGetAllUsersQuery(undefined); 
   const [updateUserRole] = useUserUpdateRoleMutation();
   const [selectedRole, setSelectedRole] = useState<{ [key: string]: string }>({});
 

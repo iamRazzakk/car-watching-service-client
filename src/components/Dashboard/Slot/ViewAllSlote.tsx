@@ -17,12 +17,11 @@ interface Slot {
   date: string;
   startTime: string;
   endTime: string;
-  isBooked: "available" | "canceled";
+  isBooked: "available" | "canceled" | "booked"; // Updated to include "booked"
 }
 
-const ViewAllSlote: React.FC = () => {
-  const { data: slots, isLoading: slotsLoading } =
-    useGetAllSlotsQuery(undefined);
+const ViewAllSlote: React.FC = ({ serviceId, date }) => {
+  const { data: slots, isLoading: slotsLoading } = useGetAllSlotsQuery({ serviceId, date });
   const [updateSlotStatus] = useUpdateSlotStatusMutation();
 
   const handleStatusUpdate = async (
@@ -30,10 +29,9 @@ const ViewAllSlote: React.FC = () => {
     newStatus: "available" | "canceled"
   ) => {
     try {
-      await updateSlotStatus({ id: slotId, status: newStatus }).unwrap();
+      await updateSlotStatus({ slotId, body: { status: newStatus } }).unwrap();
       toast.success("Slot status updated successfully");
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
+    } catch (error) {
       let errorMessage = "Error updating status";
       if (error?.data?.message) {
         errorMessage = error.data.message;
@@ -67,9 +65,8 @@ const ViewAllSlote: React.FC = () => {
 
   if (slotsLoading) return <LoadingPage />;
 
-  // Map to include both available and canceled slots
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const filteredSlots: Slot[] = (slots?.data || []).map((slot: any) => slot);
+  // Assuming slots.data is an array of slot objects
+  const filteredSlots: Slot[] = slots?.data || [];
 
   const columns = [
     {
@@ -96,9 +93,9 @@ const ViewAllSlote: React.FC = () => {
       title: "Status",
       dataIndex: "isBooked",
       key: "status",
-      render: (status: "available" | "canceled") => (
-        <Tag color={status === "available" ? "green" : "volcano"}>
-          {status === "available" ? "Available" : "Canceled"}
+      render: (status: "available" | "canceled" | "booked") => (
+        <Tag color={status === "available" ? "green" : status === "canceled" ? "volcano" : "blue"}>
+          {status === "available" ? "Available" : status === "canceled" ? "Canceled" : "Booked"}
         </Tag>
       ),
     },
@@ -106,11 +103,8 @@ const ViewAllSlote: React.FC = () => {
       title: "Actions",
       key: "actions",
       render: (slot: Slot) => (
-        <Dropdown
-          overlay={getMenu(slot._id, slot.isBooked)}
-          trigger={["click"]}
-        >
-          <Button>
+        <Dropdown overlay={getMenu(slot._id, slot.isBooked)} trigger={["click"]}>
+          <Button disabled={slot.isBooked === "booked"}> {/* Disable button if booked */}
             Actions <DownOutlined />
           </Button>
         </Dropdown>

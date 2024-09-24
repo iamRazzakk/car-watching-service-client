@@ -6,6 +6,7 @@ import img3 from "../../assets/img3.jpg";
 import { GrFormPrevious } from "react-icons/gr";
 import { GrFormNext } from "react-icons/gr";
 import Button from "../../shared/Button/Button";
+import { useNavigate } from "react-router-dom";
 
 const HeroSection = () => {
   const images = [img1, img2, img3];
@@ -31,7 +32,7 @@ const HeroSection = () => {
       button2Text: "Order Now",
     },
   ];
-  const handleButtonClick = (buttonType:string) => {
+  const handleButtonClick = (buttonType: string) => {
     console.log(`${buttonType} button clicked`);
   };
   const customPrevArrow = (
@@ -45,6 +46,7 @@ const HeroSection = () => {
       <GrFormNext className="text-3xl font-bold" />
     </div>
   );
+  const navigate = useNavigate();
 
   return (
     <div className="w-full relative">
@@ -72,19 +74,26 @@ const HeroSection = () => {
                 {slidesInfo[idx].description}
               </p>
               <div className="space-x-4">
-              <div className="space-x-4">
-              <Button
-                  text={slidesInfo[idx].button1Text}
-                  category="primary"
-                  onClick={() => handleButtonClick("Primary")}
-                />
-                <Button
-                  text={slidesInfo[idx].button2Text}
-                  type="primary"
-                  className="bg-white text-black"
-                  onClick={() => handleButtonClick("Secondary")}
-                />
-              </div>
+                <div className="space-x-4">
+                  <Button
+                    text={slidesInfo[idx].button1Text}
+                    category="primary"
+                    onClick={() => {
+                      handleButtonClick("Primary");
+                      navigate("/about-us");
+                    }}
+                  />
+                  <Button
+                    text={slidesInfo[idx].button2Text}
+                    type="button"
+                    category="secondary"
+                    className="bg-white text-black"
+                    onClick={() => {
+                      handleButtonClick("Secondary")
+                      navigate("/services");
+                    }}
+                  />
+                </div>
               </div>
             </div>
           </div>

@@ -60,24 +60,16 @@ const User: React.FC = () => {
     }
   };
 
-  const handleUploadChange = async (info: any) => {
-    if (info.file.status === "done") {
-      // File uploaded successfully
-      toast.success(`${info.file.name} uploaded successfully`);
-    } else if (info.file.status === "error") {
-      // File upload failed
-      toast.error(`${info.file.name} upload failed.`);
-    }
-  };
   const handleProfilePictureChange = async (file: any) => {
     const formData = new FormData();
     formData.append("profilePicture", file);
-
+  
     try {
       await uploadProfilePicture(formData).unwrap();
       toast.success("Profile picture uploaded successfully");
     } catch (error) {
       toast.error("Failed to upload profile picture. Please try again.");
+      console.log(error);
     }
   };
 
@@ -104,10 +96,16 @@ const User: React.FC = () => {
               style={{ marginBottom: "16px" }}
             />
             <Upload
-              name="avatar" // This should match the name expected by the backend
+              name="profilePicture" // This should match the name expected by the backend
               showUploadList={false}
-              action="http://localhost:5000/api/auth/upload-avatar" 
-              onChange={handleUploadChange}
+              customRequest={async ({ file, onSuccess, onError }) => {
+                try {
+                  await handleProfilePictureChange(file);
+                  onSuccess(file); // Call onSuccess when the upload is successful
+                } catch (error) {
+                  onError(new Error("Upload failed.")); // Call onError on failure
+                }
+              }}
             >
               <Button icon={<UploadOutlined />}>Change Picture</Button>
             </Upload>

@@ -15,6 +15,7 @@ const reviewApi = baseApi.injectEndpoints({
         method: "GET",
         body: reviewData,
       }),
+      providesTags: ["review"],
     }),
   }),
 });
