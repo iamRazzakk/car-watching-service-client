@@ -14,7 +14,6 @@ const ServicePage = () => {
     (state: RootState) => state.services
   );
   const { data, isLoading } = useGetAllCarServicesQuery(undefined);
-  console.log(data.data);
 
 
   // Set services in Redux store when data is fetched

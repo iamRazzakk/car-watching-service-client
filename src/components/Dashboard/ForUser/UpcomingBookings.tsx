@@ -17,13 +17,12 @@ const UpcomingBookings: React.FC = () => {
 
   const today = moment().startOf("day");
 
-  // Filter for upcoming bookings for the current user based on email
   const upcomingBookings = bookings?.data?.filter((booking: Booking) => {
     const serviceDetailsDate = moment(booking.serviceDetails?.date);
-    const isUserMatch = booking.user.email === currentUser?.email; 
-    const isDateAfterToday = serviceDetailsDate.isAfter(today); 
+    const isUserMatch = booking.user.email === currentUser?.email;
+    const isDateAfterToday = serviceDetailsDate.isAfter(today);
 
-    return isUserMatch && isDateAfterToday; 
+    return isUserMatch && isDateAfterToday;
   });
 
   // Custom countdown renderer for bookings
@@ -47,25 +46,33 @@ const UpcomingBookings: React.FC = () => {
   return (
     <Row gutter={[16, 16]} justify="center">
       {upcomingBookings?.length > 0 ? (
-        upcomingBookings.map((booking: Booking) => (
-          <Col key={booking._id} xs={24} sm={12} md={8} lg={6}>
-            <Card title={`Service: ${booking.serviceDetails.serviceName}`}>
-              <p>
-                Date: {moment(booking.serviceDetails.date).format("YYYY-MM-DD")}
-              </p>
-              <p>
-                Time: {booking.serviceDetails.startTime} -{" "}
-                {booking.serviceDetails.endTime}
-              </p>
-              <p>Status: {booking.status}</p>
-              <Title level={4}>Countdown:</Title>
-              <Countdown
-                date={moment(booking.serviceDetails.date).toDate()}
-                renderer={countdownRenderer}
-              />
-            </Card>
-          </Col>
-        ))
+        upcomingBookings.map((booking: Booking) => {
+          const bookingDateTime = moment(
+            `${moment(booking.serviceDetails.date).format("YYYY-MM-DD")}T${booking.serviceDetails.startTime}`
+          );
+          
+
+          return (
+            <Col key={booking._id} xs={24} sm={12} md={8} lg={6}>
+              <Card title={`Service: ${booking.serviceDetails.serviceName}`}>
+                <p>
+                  Date:{" "}
+                  {moment(booking.serviceDetails.date).format("YYYY-MM-DD")}
+                </p>
+                <p>
+                  Time: {booking.serviceDetails.startTime} -{" "}
+                  {booking.serviceDetails.endTime}
+                </p>
+                <p>Status: {booking.status}</p>
+                <Title level={4}>Countdown:</Title>
+                <Countdown
+                  date={bookingDateTime.toDate()} // Ensure this is the correct date
+                  renderer={countdownRenderer}
+                />
+              </Card>
+            </Col>
+          );
+        })
       ) : (
         <Col span={24}>
           <p style={{ textAlign: "center" }}>No upcoming bookings found.</p>

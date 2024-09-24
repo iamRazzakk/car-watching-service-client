@@ -25,10 +25,10 @@ const slotApi = baseApi.injectEndpoints({
       providesTags: ["SlotList"],
     }),
     updateSlotStatus: builder.mutation({
-      query: ({ id, status }) => ({
+      query: ({ slotId, body }) => ({
         method: "PUT",
-        url: `/services/slots/update-status/${id}`,
-        body: { status },
+        url: `/services/slots/update-status/${slotId}`,
+        body
       }),
       invalidatesTags: ["SlotList"],
     }),

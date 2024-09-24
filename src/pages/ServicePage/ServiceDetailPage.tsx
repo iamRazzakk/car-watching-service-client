@@ -7,7 +7,10 @@ import { FaDollarSign, FaClock } from "react-icons/fa";
 import NavigationButtons from "../../shared/NavigationButtons/NavigationButtons";
 import { DatePicker } from "antd";
 import moment, { Moment } from "moment";
-import { useGetAllSlotsQuery } from "../../redux/Api/slot/slotApi";
+import {
+  useGetAllSlotsQuery,
+  useUpdateSlotStatusMutation,
+} from "../../redux/Api/slot/slotApi";
 import { addBookmark } from "../../redux/features/auth/bookingSlice";
 import { toast } from "sonner";
 
@@ -20,6 +23,7 @@ const ServiceDetailPage: React.FC = () => {
   // Fetching service details
   const { data: serviceData, isLoading: serviceLoading } =
     useGetCarServiceByIdQuery(id);
+  const [updateSlotStatus] = useUpdateSlotStatusMutation();
   const serviceList = serviceData?.data;
 
   // Fetching available slots for the selected service and date
@@ -31,7 +35,8 @@ const ServiceDetailPage: React.FC = () => {
   const sloteList = slotsData?.data;
 
   // Handle Slot Selection and automatic booking
-  const handleSlotSelect = (slot) => {
+  const handleSlotSelect = async (slot) => {
+    console.log("Selected slot:", slot);
     const serviceBookingData = {
       serviceId: serviceList._id,
       slotId: slot._id,
@@ -43,31 +48,30 @@ const ServiceDetailPage: React.FC = () => {
       startTime: slot.startTime,
       endTime: slot.endTime,
     };
-    console.log("serviceBookingData", serviceBookingData);
+    
+    // Dispatch the bookmark action
     dispatch(addBookmark(serviceBookingData));
-    navigate("/booking", { state: { bookingData: serviceBookingData } });
-    toast.success("Bookmark Successfully");
+    
+    // Prepare data for updating the slot status
+    const updateData = {
+      status: "booked",
+    };
+  
+    try {
+      console.log("Updating slot ID:", slot._id);
+      await updateSlotStatus({ slotId: slot._id, body: updateData }).unwrap();
+      toast.success("Slot successfully booked!");
+      navigate("/booking", { state: { bookingData: serviceBookingData } });
+    } catch (error) {
+      console.error("Error updating slot status:", error);
+      toast.error("Failed to book the slot.");
+    }
   };
 
   useEffect(() => {
     console.log("Selected Date:", selectedDate.format("YYYY-MM-DD"));
     console.log("Slots Data:", sloteList); // Check what data is returned
-
-    const availableSlots =
-      sloteList?.filter(
-        (slot) =>
-          slot.service._id === serviceList._id &&
-          slot.isBooked !== "booked" &&
-          slot.date === selectedDate.format("YYYY-MM-DD") // Compare with the selected date
-      ) || [];
-
-    console.log(
-      `Available slots for selected date (${selectedDate.format(
-        "YYYY-MM-DD"
-      )}):`,
-      availableSlots.length
-    );
-  }, [sloteList, selectedDate, serviceList]);
+  }, [sloteList, selectedDate]);
 
   if (serviceLoading || slotsLoading) return <LoadingPage />;
 
@@ -128,7 +132,7 @@ const ServiceDetailPage: React.FC = () => {
                       (slot) =>
                         slot.service._id === serviceList._id &&
                         slot.isBooked !== "booked" &&
-                        slot.date === selectedDate.format("YYYY-MM-DD") // Show only available slots for selected date
+                        slot.date === selectedDate.format("YYYY-MM-DD") 
                     )
                     .map((slot) => (
                       <button
