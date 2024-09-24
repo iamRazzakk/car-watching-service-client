@@ -11,25 +11,19 @@ const slotApi = baseApi.injectEndpoints({
       invalidatesTags: ["SlotList"],
     }),
     getAllSlots: builder.query({
-      query: (date) => ({
+      query: ({ serviceId, date }) => ({
         url: "/slots/availability",
-        params: date,
+        params: { serviceId, date },
       }),
       providesTags: ["SlotList"],
     }),
     getSingleSlot: builder.query({
-      query: (id) => {
-        console.log(id);
-        return {
-          url: `/services/slots/${id}`,
-          method: "GET",
-        };
-      },
-
+      query: (id) => ({
+        url: `/services/slots/${id}`,
+        method: "GET",
+      }),
       providesTags: ["SlotList"],
     }),
-
-    //http://localhost:5000/api/services/slots/66ef8d71e2e10fac4e1f6e4f
     updateSlotStatus: builder.mutation({
       query: ({ id, status }) => ({
         method: "PUT",
