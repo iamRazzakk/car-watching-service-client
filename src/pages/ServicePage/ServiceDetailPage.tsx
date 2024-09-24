@@ -35,6 +35,7 @@ const ServiceDetailPage: React.FC = () => {
     const serviceBookingData = {
       serviceId: serviceList._id,
       slotId: slot._id,
+      sloteDate: slot.date,
       serviceName: serviceList.name,
       serviceImage: serviceList.image?.url || "",
       duration: serviceList.duration,
@@ -42,7 +43,7 @@ const ServiceDetailPage: React.FC = () => {
       startTime: slot.startTime,
       endTime: slot.endTime,
     };
-
+    console.log("serviceBookingData", serviceBookingData);
     dispatch(addBookmark(serviceBookingData));
     navigate("/booking", { state: { bookingData: serviceBookingData } });
     toast.success("Bookmark Successfully");

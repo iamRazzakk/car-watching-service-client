@@ -28,6 +28,7 @@ const ServiceBooking: React.FC = () => {
   const [form] = Form.useForm();
   console.log(myBooking);
   const selectedBooking = myBooking;
+  console.log("Selected Booking Date:", selectedBooking.sloteDate);
 
   if (!selectedBooking) {
     return <div>No booking found.</div>;
@@ -49,26 +50,29 @@ const ServiceBooking: React.FC = () => {
         registrationPlate: values.registrationPlate,
       },
       serviceDetails: {
-        serviceId: selectedBooking._id,
+        serviceId: selectedBooking.serviceId,
         serviceName: selectedBooking.serviceName,
         startTime: values.startTime || selectedBooking.startTime,
         endTime: values.endTime || selectedBooking.endTime,
         duration: values.duration || selectedBooking.duration,
         price: selectedBooking.price,
+        date: selectedBooking.sloteDate, // Ensure this is correctly assigned
       },
       totalPrice: selectedBooking.price,
       userId: currentUser?._id,
     };
 
+    console.log("Form Data being sent:", formData.serviceDetails.date); 
+
     try {
-      const paymentResponse = await makePayment(formData).unwrap();
+      const paymentResponse = await makePayment(formData).unwrap(); 
       if (paymentResponse.success) {
         window.location.href = paymentResponse.data.payment_url;
       }
       toast.success("Payment successful! Redirecting...");
     } catch (error) {
-      console.error("Payment failed:", error.data.message);
-      toast.error("Payment failed: " + error.data.message);
+      console.error("Payment failed:", error.data?.message || error.message); 
+      toast.error("Payment failed: " + (error.data?.message || error.message));
     }
   };
 

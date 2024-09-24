@@ -1,13 +1,12 @@
-import { Card, Col, Row, Typography } from 'antd';
-import Countdown, { CountdownRendererFn } from 'react-countdown';
-import { useGetAllOrdersQuery } from '../../../redux/Api/orderApi/orderApi';
-import { useAppSelector } from '../../../redux/hooks';
-import { useCurrentUser } from '../../../redux/features/auth/authslice';
-import moment from 'moment';
-import LoadingPage from '../../../pages/Loading/LoadingPage';
-import { Booking } from '../../../types/UpcommingTypes/Upcomming.Types';
+import { Card, Col, Row, Typography } from "antd";
+import Countdown, { CountdownRendererFn } from "react-countdown";
+import { useGetAllOrdersQuery } from "../../../redux/Api/orderApi/orderApi";
+import { useAppSelector } from "../../../redux/hooks";
+import { useCurrentUser } from "../../../redux/features/auth/authslice";
+import moment from "moment";
+import LoadingPage from "../../../pages/Loading/LoadingPage";
+import { Booking } from "../../../types/UpcommingTypes/Upcomming.Types";
 
-// Use the defined types
 const { Title } = Typography;
 
 const UpcomingBookings: React.FC = () => {
@@ -16,14 +15,25 @@ const UpcomingBookings: React.FC = () => {
 
   if (isLoading) return <LoadingPage />;
 
-  // Filter upcoming bookings (based on user and booking date)
-  const upcomingBookings = bookings?.data?.filter((booking:Booking) => {
-    const bookingDateTime = moment(`${booking.date}T${booking.time}`, "YYYY-MM-DDTHH:mm");
-    return moment().isBefore(bookingDateTime) && booking.user._id === currentUser?._id;
+  const today = moment().startOf("day");
+
+  // Filter for upcoming bookings for the current user based on email
+  const upcomingBookings = bookings?.data?.filter((booking: Booking) => {
+    const serviceDetailsDate = moment(booking.serviceDetails?.date);
+    const isUserMatch = booking.user.email === currentUser?.email; 
+    const isDateAfterToday = serviceDetailsDate.isAfter(today); 
+
+    return isUserMatch && isDateAfterToday; 
   });
 
-  // Custom countdown renderer
-  const countdownRenderer: CountdownRendererFn = ({ days, hours, minutes, seconds, completed }) => {
+  // Custom countdown renderer for bookings
+  const countdownRenderer: CountdownRendererFn = ({
+    days,
+    hours,
+    minutes,
+    seconds,
+    completed,
+  }) => {
     if (completed) {
       return <span>Booking time has passed!</span>;
     }
@@ -35,24 +45,31 @@ const UpcomingBookings: React.FC = () => {
   };
 
   return (
-    <Row gutter={16}>
+    <Row gutter={[16, 16]} justify="center">
       {upcomingBookings?.length > 0 ? (
-        upcomingBookings.map((booking:Booking) => (
-          <Col span={8} key={booking._id}>
+        upcomingBookings.map((booking: Booking) => (
+          <Col key={booking._id} xs={24} sm={12} md={8} lg={6}>
             <Card title={`Service: ${booking.serviceDetails.serviceName}`}>
-              <p>Date: {booking.date}</p>
-              <p>Time: {booking.serviceDetails.startTime} - {booking.serviceDetails.endTime}</p>
+              <p>
+                Date: {moment(booking.serviceDetails.date).format("YYYY-MM-DD")}
+              </p>
+              <p>
+                Time: {booking.serviceDetails.startTime} -{" "}
+                {booking.serviceDetails.endTime}
+              </p>
               <p>Status: {booking.status}</p>
               <Title level={4}>Countdown:</Title>
               <Countdown
-                date={moment(`${booking.date}T${booking.serviceDetails.startTime}`).toDate()}
+                date={moment(booking.serviceDetails.date).toDate()}
                 renderer={countdownRenderer}
               />
             </Card>
           </Col>
         ))
       ) : (
-        <p>No upcoming bookings found</p>
+        <Col span={24}>
+          <p style={{ textAlign: "center" }}>No upcoming bookings found.</p>
+        </Col>
       )}
     </Row>
   );
