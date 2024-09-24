@@ -15,6 +15,7 @@ export type UserProfile = {
 };
 
 export type UserPasswordUpdate = {
+  email?:string
   oldPassword: string;
   newPassword: string;
 };

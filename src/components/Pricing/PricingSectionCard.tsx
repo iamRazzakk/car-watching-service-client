@@ -7,6 +7,7 @@ import {
   FaCog,
   FaTools,
 } from "react-icons/fa";
+
 const iconMap = {
   "Exterior Wash": FaCarCrash,
   "Interior Cleaning": FaTachometerAlt,
@@ -19,9 +20,13 @@ const iconMap = {
   "Engine Detailing": FaCog,
   "Clay Bar Treatment": FaPaintBrush,
 };
+
+type IconMapKey = keyof typeof iconMap;
+
 const handleButtonClick = (buttonType: string) => {
   console.log(`${buttonType} button clicked`);
 };
+
 const PricingSectionCard: React.FC<PricingSectionCardProps> = ({
   serviceName,
   price,
@@ -42,7 +47,7 @@ const PricingSectionCard: React.FC<PricingSectionCardProps> = ({
           {subcategories.length > 0 && (
             <ul className="list-disc list-inside ml-4 space-y-2">
               {subcategories.map((sub) => {
-                const IconComponent = iconMap[sub.name] || FaCarCrash;
+                const IconComponent = iconMap[sub.name as IconMapKey] || FaCarCrash;
                 return (
                   <li key={sub.id} className="flex items-center justify-center">
                     <IconComponent className="text-blue-700 mr-2 text-base md:text-lg" />

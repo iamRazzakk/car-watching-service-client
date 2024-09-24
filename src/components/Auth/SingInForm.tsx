@@ -26,13 +26,13 @@ const SingInForm = () => {
     e.preventDefault();
     try {
       const res = await signInUser(formData).unwrap();
-      console.log(res);
+      // console.log(res);
       const user = res.data;
       const token = res.accessToke;
       const userData = { user, token };
       if (res.success) {
         // Dispatch the setUser action with correct payload
-        dispatch(setUser( userData ));
+        dispatch(setUser(userData));
 
         toast.success("User logged in successfully!");
         navigate("/dashboard/me");
@@ -40,7 +40,9 @@ const SingInForm = () => {
         toast.error(res.message || "Sign in failed.");
       }
     } catch (error) {
-      toast.error(`Failed to sign in: ${error.message as string}`);
+      const errorMessage =
+        (error as Error).message || "An unknown error occurred";
+      toast.error(`Failed to sign in: ${errorMessage}`);
     }
   };
 

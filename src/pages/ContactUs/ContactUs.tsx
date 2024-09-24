@@ -24,13 +24,14 @@ const ContactUs = () => {
     e.preventDefault();
     try {
       // Simulate form submission
-      console.log(formData);
+      // console.log(formData);
+      setStatus("Your message has been sent!");
       // Show success toast message
       toast.success("Your message has been sent!");
       setFormData({ name: "", email: "", message: "" });
-    } catch (error) {
-      // Show error toast message
+    } catch (error: unknown) {
       toast.error("There was an error sending your message. Please try again.");
+      setStatus("There was an error sending your message. Please try again.");
     }
   };
 

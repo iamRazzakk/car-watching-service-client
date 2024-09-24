@@ -18,6 +18,7 @@ export type ServiceDetails = {
   duration: number;
   startTime: string;
   endTime: string;
+  date?: string;
 };
 
 export type Booking = {

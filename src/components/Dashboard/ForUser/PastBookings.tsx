@@ -13,7 +13,7 @@ const PastBookings: React.FC = () => {
   const pastBookings = bookings?.data?.filter(
     (booking: Booking) => booking.user.email === currentUser?.email
   );
-  console.log(pastBookings);
+  // console.log(pastBookings);
 
   if (isLoading) return <LoadingPage />;
 

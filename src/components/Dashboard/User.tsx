@@ -11,7 +11,7 @@ import {
   Input,
   Upload,
 } from "antd";
-import { UploadOutlined, EditOutlined, SaveOutlined } from "@ant-design/icons";
+import {  EditOutlined, SaveOutlined } from "@ant-design/icons";
 import { useAppSelector } from "../../redux/hooks";
 import { useCurrentUser } from "../../redux/features/auth/authslice";
 import {
@@ -55,7 +55,7 @@ const User: React.FC = () => {
       toast.success("Password changed successfully");
       form.resetFields();
       setIsEditing(false);
-    } catch (error) {
+    } catch (error: unknown) {
       toast.error("Failed to change password. Please try again.");
     }
   };
@@ -63,13 +63,13 @@ const User: React.FC = () => {
   const handleProfilePictureChange = async (file: any) => {
     const formData = new FormData();
     formData.append("profilePicture", file);
-  
+
     try {
       await uploadProfilePicture(formData).unwrap();
       toast.success("Profile picture uploaded successfully");
-    } catch (error) {
+    } catch (error: unknown) {
       toast.error("Failed to upload profile picture. Please try again.");
-      console.log(error);
+      // console.log(error);
     }
   };
 
@@ -96,18 +96,24 @@ const User: React.FC = () => {
               style={{ marginBottom: "16px" }}
             />
             <Upload
-              name="profilePicture" // This should match the name expected by the backend
+              name="profilePicture"
               showUploadList={false}
               customRequest={async ({ file, onSuccess, onError }) => {
                 try {
                   await handleProfilePictureChange(file);
-                  onSuccess(file); // Call onSuccess when the upload is successful
-                } catch (error) {
-                  onError(new Error("Upload failed.")); // Call onError on failure
+                  // Ensure onSuccess is defined before calling
+                  if (onSuccess) {
+                    onSuccess(file);
+                  }
+                } catch (error: unknown) {
+                  // Ensure onError is defined before calling
+                  if (onError) {
+                    onError(new Error("Upload failed."));
+                  }
                 }
               }}
             >
-              <Button icon={<UploadOutlined />}>Change Picture</Button>
+              {/* Upload Button or Custom Content Here */}
             </Upload>
           </Col>
           <Col span={16}>

@@ -5,4 +5,5 @@ export type Slot ={
     startTime: string; 
     endTime: string; 
     isBooked: "available" | "booked";
+    sloteDate?: Date
 }

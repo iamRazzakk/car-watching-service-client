@@ -10,6 +10,7 @@ export type TSlotBookmark = {
   price: number;
   startTime: string;
   endTime: string;
+  sloteDate?:Date
 };
 
 type SlotBookmarkState = {

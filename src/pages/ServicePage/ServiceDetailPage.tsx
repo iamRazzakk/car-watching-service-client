@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useDispatch } from "react-redux";
@@ -35,8 +36,9 @@ const ServiceDetailPage: React.FC = () => {
   const sloteList = slotsData?.data;
 
   // Handle Slot Selection and automatic booking
-  const handleSlotSelect = async (slot) => {
-    console.log("Selected slot:", slot);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const handleSlotSelect = async (slot:any) => {
+    // console.log("Selected slot:", slot);
     const serviceBookingData = {
       serviceId: serviceList._id,
       slotId: slot._id,
@@ -70,7 +72,7 @@ const ServiceDetailPage: React.FC = () => {
 
   useEffect(() => {
     console.log("Selected Date:", selectedDate.format("YYYY-MM-DD"));
-    console.log("Slots Data:", sloteList); // Check what data is returned
+    console.log("Slots Data:", sloteList); 
   }, [sloteList, selectedDate]);
 
   if (serviceLoading || slotsLoading) return <LoadingPage />;
@@ -129,12 +131,12 @@ const ServiceDetailPage: React.FC = () => {
                 <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
                   {sloteList
                     ?.filter(
-                      (slot) =>
+                      (slot:any) =>
                         slot.service._id === serviceList._id &&
                         slot.isBooked !== "booked" &&
                         slot.date === selectedDate.format("YYYY-MM-DD") 
                     )
-                    .map((slot) => (
+                    .map((slot:any) => (
                       <button
                         key={slot._id}
                         onClick={() => handleSlotSelect(slot)}
@@ -145,7 +147,7 @@ const ServiceDetailPage: React.FC = () => {
                     ))}
                   {/* Message when no available slots */}
                   {sloteList?.filter(
-                    (slot) =>
+                    (slot:any) =>
                       slot.service._id === serviceList._id &&
                       slot.isBooked !== "booked" &&
                       slot.date === selectedDate.format("YYYY-MM-DD")

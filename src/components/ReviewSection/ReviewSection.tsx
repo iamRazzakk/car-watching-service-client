@@ -77,7 +77,7 @@ const ReviewSection: React.FC = () => {
           <h3 className="mt-4 text-lg">
             Overall Rating: {averageRating.toFixed(1)} ⭐
           </h3>
-          <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="mt-4 grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-4">
             <h4 className="text-lg font-semibold col-span-2">Recent Reviews:</h4>
             {/* Show all reviews or the latest two based on state */}
             {(showAllReviews ? reviews : reviews.slice(-2)).map((review: Review) => (

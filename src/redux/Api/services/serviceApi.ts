@@ -15,7 +15,8 @@ const serviceApi = baseApi.injectEndpoints({
     getCarServiceById: builder.query({
       query: (id) => `/services/${id}`,
       // Provides a tag for this specific service
-      providesTags: (result, error, id) => [{ type: "Service", id }],
+      providesTags: (_result, _error, id) => [{ type: "Service", id }],
+
     }),
 
     getAllCarServices: builder.query({
@@ -33,7 +34,7 @@ const serviceApi = baseApi.injectEndpoints({
         url: `/services/${id}`,
         body: serviceData,
       }),
-      invalidatesTags: (result, error, { id }) => [
+      invalidatesTags: (_, __, { id }) => [
         { type: "Service", id },
         { type: "Service", id: "LIST" },
       ],

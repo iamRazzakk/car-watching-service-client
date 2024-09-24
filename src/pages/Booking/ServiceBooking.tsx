@@ -26,14 +26,15 @@ const ServiceBooking: React.FC = () => {
   const currentUser = useAppSelector(useCurrentUser);
   const [makePayment, { isLoading }] = useMakePaymentMutation();
   const [form] = Form.useForm();
-  console.log(myBooking);
+  // console.log(myBooking);
   const selectedBooking = myBooking;
-  console.log("Selected Booking Date:", selectedBooking.sloteDate);
+  // console.log("Selected Booking Date:", selectedBooking?.sloteDate);
 
   if (!selectedBooking) {
     return <div>No booking found.</div>;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleSubmit = async (values: any) => {
     const formData = {
       user: {
@@ -62,17 +63,19 @@ const ServiceBooking: React.FC = () => {
       userId: currentUser?._id,
     };
 
-    console.log("Form Data being sent:", formData.serviceDetails.date); 
+    // console.log("Form Data being sent:", formData.serviceDetails.date);
 
     try {
-      const paymentResponse = await makePayment(formData).unwrap(); 
+      const paymentResponse = await makePayment(formData).unwrap();
       if (paymentResponse.success) {
         window.location.href = paymentResponse.data.payment_url;
       }
       toast.success("Payment successful! Redirecting...");
-    } catch (error) {
-      console.error("Payment failed:", error.data?.message || error.message); 
-      toast.error("Payment failed: " + (error.data?.message || error.message));
+    } catch (error: unknown) {
+      const apiError = error as { data?: { message: string }; message: string };
+
+  // Display the error message
+  toast.error("Payment failed: " + (apiError.data?.message || apiError.message));
     }
   };
 

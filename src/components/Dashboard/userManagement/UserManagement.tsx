@@ -51,7 +51,8 @@ const UserManagement = () => {
     {
       title: 'Actions',
       key: 'actions',
-      render: (text: any, record: any) => (
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      render: (_text: any, record: any) => (
         <Space>
           {/* Conditionally render dropdown based on the current role */}
           <Select
@@ -75,6 +76,7 @@ const UserManagement = () => {
     <div>
       <Table
         columns={columns}
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         dataSource={allUsers.map((user: any) => ({ ...user, key: user._id }))}
         pagination={{ pageSize: 10 }}
       />

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React from "react";
 import { Form, Button, DatePicker, TimePicker, Select } from "antd";
 import { useCreateSlotMutation } from "../../../redux/Api/slot/slotApi";
@@ -9,7 +10,7 @@ const { Option } = Select;
 
 const CreateSlot: React.FC = () => {
   const [createSlot, { isLoading }] = useCreateSlotMutation();
-  const { data, isLoading: servicesLoading } = useGetAllCarServicesQuery();
+  const { data, isLoading: servicesLoading } = useGetAllCarServicesQuery(undefined);
   const [form] = Form.useForm();
 
   // Extract services data

@@ -50,14 +50,14 @@ const FilterSearchComponent: React.FC = () => {
           type="number"
           name="minPrice"
           placeholder="Min Price"
-          value={filters.minPrice || ''}
+          value={filters.minPrice !== undefined ? filters.minPrice.toString() : ''}
           onChange={handleMinPriceChange}
         />
         <CInput
           type="number"
           name="maxPrice"
           placeholder="Max Price"
-          value={filters.maxPrice || ''}
+          value={filters.maxPrice !== undefined ? filters.maxPrice.toString() : ''}
           onChange={handleMaxPriceChange}
         />
         <SortComponent />

@@ -1,4 +1,3 @@
-import React from "react";
 import { Table, Button, Tag, Dropdown, Menu } from "antd";
 import { DownOutlined } from "@ant-design/icons";
 import { toast } from "sonner";
@@ -17,11 +16,16 @@ interface Slot {
   date: string;
   startTime: string;
   endTime: string;
-  isBooked: "available" | "canceled" | "booked"; // Updated to include "booked"
+  isBooked: "available" | "canceled" | "booked";
 }
 
-const ViewAllSlote: React.FC = ({ serviceId, date }) => {
-  const { data: slots, isLoading: slotsLoading } = useGetAllSlotsQuery({ serviceId, date });
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const ViewAllSlote = (props: any) => {
+  const { serviceId, date } = props;
+  const { data: slots, isLoading: slotsLoading } = useGetAllSlotsQuery({
+    serviceId,
+    date,
+  });
   const [updateSlotStatus] = useUpdateSlotStatusMutation();
 
   const handleStatusUpdate = async (
@@ -33,11 +37,20 @@ const ViewAllSlote: React.FC = ({ serviceId, date }) => {
       toast.success("Slot status updated successfully");
     } catch (error) {
       let errorMessage = "Error updating status";
-      if (error?.data?.message) {
-        errorMessage = error.data.message;
-      } else if (error?.message) {
-        errorMessage = error.message;
+
+      // Check if the error is a known structure
+      if (typeof error === "object" && error !== null) {
+        if (
+          "data" in error &&
+          typeof error.data === "object" &&
+          error.data !== null
+        ) {
+          console.log(error);
+        } else if ("message" in error && typeof error.message === "string") {
+          errorMessage = error.message; // Use the error's message
+        }
       }
+
       toast.error(errorMessage);
     }
   };
@@ -94,8 +107,20 @@ const ViewAllSlote: React.FC = ({ serviceId, date }) => {
       dataIndex: "isBooked",
       key: "status",
       render: (status: "available" | "canceled" | "booked") => (
-        <Tag color={status === "available" ? "green" : status === "canceled" ? "volcano" : "blue"}>
-          {status === "available" ? "Available" : status === "canceled" ? "Canceled" : "Booked"}
+        <Tag
+          color={
+            status === "available"
+              ? "green"
+              : status === "canceled"
+              ? "volcano"
+              : "blue"
+          }
+        >
+          {status === "available"
+            ? "Available"
+            : status === "canceled"
+            ? "Canceled"
+            : "Booked"}
         </Tag>
       ),
     },
@@ -103,8 +128,14 @@ const ViewAllSlote: React.FC = ({ serviceId, date }) => {
       title: "Actions",
       key: "actions",
       render: (slot: Slot) => (
-        <Dropdown overlay={getMenu(slot._id, slot.isBooked)} trigger={["click"]}>
-          <Button disabled={slot.isBooked === "booked"}> {/* Disable button if booked */}
+        <Dropdown
+          overlay={getMenu(
+            slot._id,
+            slot.isBooked !== "booked" ? slot.isBooked : "available"
+          )}
+          trigger={["click"]}
+        >
+          <Button disabled={slot.isBooked === "booked"}>
             Actions <DownOutlined />
           </Button>
         </Dropdown>
