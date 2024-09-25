@@ -1,50 +1,85 @@
-# React + TypeScript + Vite
+# Car Wash Booking System - Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Welcome to the **Car Wash Booking System** frontend repository. This project is designed to provide users with a seamless and intuitive car wash booking experience. The frontend of this application is built using modern web technologies and focuses on user-friendly navigation, responsive design, and rich features for both users and administrators.
 
-Currently, two official plugins are available:
+## 📌 Project Overview
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+The **Car Wash Booking System** frontend allows users to:
 
-## Expanding the ESLint configuration
+- Browse and book car wash services.
+- View available slots and book services based on their convenience.
+- Manage bookings and personal information through the User Dashboard.
+- Provide feedback and rate services.
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+Administrators can manage services, slots, and users through the Admin Dashboard, ensuring an organized and efficient operation.
 
-- Configure the top-level `parserOptions` property like this:
+## 🚀 Live Demo
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+Explore the live application here:  
+[Car Wash Booking System - Live](https://car-wash-booking-system-frontend-dusky.vercel.app/)
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+## 🛠️ Key Features
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
+### Public Pages
 
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
-```
+1. **Home Page**
+   - Navigation Menu with links to essential pages.
+   - Hero section highlighting branding and services.
+   - Quick booking call-to-action.
+   - Featured services and reviews section with ratings.
+
+2. **User Authentication**
+   - Sign-up and login functionality with form validation.
+   - Token-based authentication for secure user sessions.
+
+3. **Services Page**
+   - List of all available car wash services.
+   - Search, filter, and sort functionality to help users find the best service.
+
+4. **Service Details Page**
+   - Detailed service descriptions with available time slots for booking.
+   - Calendar to select dates and view available slots.
+
+5. **Booking Page**
+   - Booking confirmation with payment integration (AAMARPAY).
+   - Display of selected service and time slot with user information.
+
+### User Dashboard
+
+- View and manage bookings.
+- Display of past bookings in a table and upcoming bookings in cards with countdown timers.
+- Profile management for updating personal details.
+
+### Admin Dashboard
+
+- **Service Management**: Add, update, delete services, all within a user-friendly interface.
+- **Slot Management**: Create, update, and manage service slots.
+- **User Management**: View and manage users, including role assignments.
+
+### Error Pages
+- Custom 404 error page with navigation options.
+
+## 🖥️ Technologies Used
+
+- **Frontend Framework**: React.js (with Redux for state management)
+- **UI Library**: Ant Design for responsive and clean components.
+- **Routing**: React Router for managing different pages.
+- **State Management**: Redux Toolkit for efficient state handling.
+- **API Integration**: Redux API for communication with the backend API.
+- **Authentication**: JWT token-based authentication for secure login and session management.
+- **Styling**: CSS, Taildwindcss for custom styles and animations.
+- **Build and Deployment**: Vercel for hosting the live application.
+
+
+## ⚙️ Backend Integration
+
+This frontend is integrated with a backend API that handles all booking, service, user, and slot management functionalities. The backend communicates securely via token-based authentication, and real-time updates are provided throughout the application.
+
+## 📈 GitHub Contributions
+
+The repository is actively maintained with meaningful commits reflecting feature development, bug fixes, and UI improvements. Each commit adheres to best practices in version control.
+
+## 🔗 Repository Link
+
+Visit the frontend code repository here:  
+[Car Wash Booking System - Frontend GitHub](https://github.com/iamRazzakk/car-watching-service-client)
