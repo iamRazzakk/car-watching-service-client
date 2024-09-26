@@ -16,7 +16,7 @@ Administrators can manage services, slots, and users through the Admin Dashboard
 ## 🚀 Live Demo
 
 Explore the live application here:  
-[Car Wash Booking System - Live](https://car-wash-booking-system-frontend-dusky.vercel.app/)
+[Car Wash Booking System - Live](https://car-wash-booking-system-eight.vercel.app/)
 
 ## 🛠️ Key Features
 
