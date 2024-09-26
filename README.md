@@ -60,8 +60,8 @@ Explore the live application here:
 
 To access the Admin Dashboard, you can use the following credentials:
 
-- **Email**: admin@example.com
-- **Password**: admin123
+- **Email**: admin@gmail.com
+- **Password**: Admin@123
 
 ### Error Pages
 - Custom 404 error page with navigation options.
