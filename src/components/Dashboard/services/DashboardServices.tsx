@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
 import {
   Button,
@@ -33,11 +34,15 @@ const DashboardServices: React.FC = () => {
   const [deleteCarService] = useDeleteCarServiceMutation();
   const [updateCarService] = useUpdateCarServiceMutation();
   const [createCarService] = useCreateCarServiceMutation();
-  const [modalVisible, setModalVisible] = useState(false);
-  const [currentRecord, setCurrentRecord] = useState<DataType | null>(null);
-  const [form] = Form.useForm();
-  const [isCreating, setIsCreating] = useState(false);
-
+  
+  const [createModalVisible, setCreateModalVisible] = useState(false); // Create modal state
+  const [editModalVisible, setEditModalVisible] = useState(false); // Edit modal state
+  const [currentRecord, setCurrentRecord] = useState<DataType | null>(null); // For editing service
+  
+  const [createForm] = Form.useForm();
+  const [editForm] = Form.useForm();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  
   // Handle loading state
   if (isLoading) return <LoadingPage />;
 
@@ -65,43 +70,48 @@ const DashboardServices: React.FC = () => {
   // Handle edit action
   const handleEdit = (record: DataType) => {
     setCurrentRecord(record);
-    form.setFieldsValue({
+    editForm.setFieldsValue({
       name: record.name,
       duration: record.duration,
       price: record.price,
       description: record.description,
     });
-    setModalVisible(true);
+    setEditModalVisible(true);
   };
 
   // Handle form submission for update
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const handleSubmit = async (values: any) => {
+  const handleUpdateSubmit = async (values: any) => {
     if (currentRecord) {
       try {
+        setIsSubmitting(true);
         await updateCarService({ id: currentRecord.key, ...values }).unwrap();
         toast.success("Service updated successfully");
-        setModalVisible(false);
+        setEditModalVisible(false);
+        editForm.resetFields();
       } catch (error) {
         const errorMessage =
           error instanceof Error ? error.message : "Failed to update service";
         toast.error(errorMessage);
+      } finally {
+        setIsSubmitting(false);
       }
     }
   };
 
   // Handle form submission for create
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const handleCreate = async (values: any) => {
+  const handleCreateSubmit = async (values: any) => {
     try {
+      setIsSubmitting(true);
       await createCarService(values).unwrap();
       toast.success("Service created successfully");
-      setModalVisible(false);
-      form.resetFields();
+      setCreateModalVisible(false);
+      createForm.resetFields();
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "Failed to create service";
       toast.error(errorMessage);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -167,9 +177,7 @@ const DashboardServices: React.FC = () => {
   // Transform fetched data to fit DataType format
   const myData: DataType[] =
     data?.data
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .filter((item: any) => !item.isDeleted)
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .map((item: any) => ({
         key: item._id,
         name: item.name,
@@ -187,10 +195,7 @@ const DashboardServices: React.FC = () => {
       <div className="lg:flex items-end justify-end lg:mb-8 md:mb-6 mb-4">
         <Button
           type="primary"
-          onClick={() => {
-            setIsCreating(true);
-            setModalVisible(true);
-          }}
+          onClick={() => setCreateModalVisible(true)}
         >
           Add New Service
         </Button>
@@ -202,80 +207,18 @@ const DashboardServices: React.FC = () => {
         scroll={{ x: "max-content" }}
       />
 
-      {/* Edit Modal */}
-      <Modal
-        title="Edit Service"
-        visible={modalVisible && !isCreating}
-        onCancel={() => setModalVisible(false)}
-        footer={null}
-      >
-        <Form
-          className=""
-          form={form}
-          layout="vertical"
-          onFinish={handleSubmit}
-        >
-          <Form.Item
-            label="Name"
-            name="name"
-            rules={[
-              { required: true, message: "Please enter the service name!" },
-            ]}
-          >
-            <Input />
-          </Form.Item>
-          <div className="flex items-center justify-between">
-            <Form.Item
-              label="Duration (min)"
-              name="duration"
-              rules={[
-                { required: true, message: "Please enter the duration!" },
-              ]}
-            >
-              <InputNumber min={0} />
-            </Form.Item>
-            <Form.Item
-              label="Price ($)"
-              name="price"
-              rules={[{ required: true, message: "Please enter the price!" }]}
-            >
-              <InputNumber min={0} />
-            </Form.Item>
-          </div>
-          <Form.Item
-            label="Description"
-            name="description"
-            rules={[
-              { required: true, message: "Please enter the description!" },
-            ]}
-          >
-            <Input.TextArea style={{ height: 120, resize: "none" }} />
-          </Form.Item>
-          <Form.Item>
-            <Button type="primary" htmlType="submit">
-              Save
-            </Button>
-          </Form.Item>
-        </Form>
-      </Modal>
-
       {/* Create Modal */}
       <Modal
         title="Add New Service"
-        visible={modalVisible && isCreating}
-        onCancel={() => {
-          setModalVisible(false);
-          setIsCreating(false);
-        }}
+        visible={createModalVisible}
+        onCancel={() => setCreateModalVisible(false)}
         footer={null}
       >
-        <Form form={form} layout="vertical" onFinish={handleCreate}>
+        <Form form={createForm} layout="vertical" onFinish={handleCreateSubmit}>
           <Form.Item
             label="Name"
             name="name"
-            rules={[
-              { required: true, message: "Please enter the service name!" },
-            ]}
+            rules={[{ required: true, message: "Please enter the service name!" }]}
           >
             <Input />
           </Form.Item>
@@ -296,15 +239,57 @@ const DashboardServices: React.FC = () => {
           <Form.Item
             label="Description"
             name="description"
-            rules={[
-              { required: true, message: "Please enter the description!" },
-            ]}
+            rules={[{ required: true, message: "Please enter the description!" }]}
           >
             <Input.TextArea style={{ height: 120, resize: "none" }} />
           </Form.Item>
           <Form.Item>
-            <Button type="primary" htmlType="submit">
+            <Button type="primary" htmlType="submit" loading={isSubmitting}>
               Create
+            </Button>
+          </Form.Item>
+        </Form>
+      </Modal>
+
+      {/* Edit Modal */}
+      <Modal
+        title="Edit Service"
+        visible={editModalVisible}
+        onCancel={() => setEditModalVisible(false)}
+        footer={null}
+      >
+        <Form form={editForm} layout="vertical" onFinish={handleUpdateSubmit}>
+          <Form.Item
+            label="Name"
+            name="name"
+            rules={[{ required: true, message: "Please enter the service name!" }]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            label="Duration (min)"
+            name="duration"
+            rules={[{ required: true, message: "Please enter the duration!" }]}
+          >
+            <InputNumber min={0} />
+          </Form.Item>
+          <Form.Item
+            label="Price ($)"
+            name="price"
+            rules={[{ required: true, message: "Please enter the price!" }]}
+          >
+            <InputNumber min={0} />
+          </Form.Item>
+          <Form.Item
+            label="Description"
+            name="description"
+            rules={[{ required: true, message: "Please enter the description!" }]}
+          >
+            <Input.TextArea style={{ height: 120, resize: "none" }} />
+          </Form.Item>
+          <Form.Item>
+            <Button type="primary" htmlType="submit" loading={isSubmitting}>
+              Update
             </Button>
           </Form.Item>
         </Form>

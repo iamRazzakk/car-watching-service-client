@@ -9,10 +9,13 @@ import {
 } from "../../redux/features/auth/serviceSlice";
 import Button from "../../shared/Button/Button";
 import SortComponent from "./SortComponent";
+import ILabel from "../../components/Form/ILabel";
 
 const FilterSearchComponent: React.FC = () => {
   const dispatch = useDispatch();
-  const searchQuery = useSelector((state: RootState) => state.services.searchQuery);
+  const searchQuery = useSelector(
+    (state: RootState) => state.services.searchQuery
+  );
   const filters = useSelector((state: RootState) => state.services.filters);
 
   const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -43,21 +46,26 @@ const FilterSearchComponent: React.FC = () => {
           value={searchQuery}
           onChange={handleSearchChange}
         />
-       
       </div>
       <div className="lg:flex items-center justify-center gap-4">
+        <ILabel label="Min: " htmlFor="Min"></ILabel>
         <CInput
           type="number"
           name="minPrice"
           placeholder="Min Price"
-          value={filters.minPrice !== undefined ? filters.minPrice.toString() : ''}
+          value={
+            filters.minPrice !== undefined ? filters.minPrice.toString() : ""
+          }
           onChange={handleMinPriceChange}
         />
+        <ILabel  label="Max: " htmlFor="Max"></ILabel>
         <CInput
           type="number"
           name="maxPrice"
           placeholder="Max Price"
-          value={filters.maxPrice !== undefined ? filters.maxPrice.toString() : ''}
+          value={
+            filters.maxPrice !== undefined ? filters.maxPrice.toString() : ""
+          }
           onChange={handleMaxPriceChange}
         />
         <SortComponent />

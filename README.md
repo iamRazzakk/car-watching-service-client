@@ -56,6 +56,13 @@ Explore the live application here:
 - **Slot Management**: Create, update, and manage service slots.
 - **User Management**: View and manage users, including role assignments.
 
+### Admin Login Credentials
+
+To access the Admin Dashboard, you can use the following credentials:
+
+- **Email**: admin@example.com
+- **Password**: admin123
+
 ### Error Pages
 - Custom 404 error page with navigation options.
 
@@ -67,9 +74,8 @@ Explore the live application here:
 - **State Management**: Redux Toolkit for efficient state handling.
 - **API Integration**: Redux API for communication with the backend API.
 - **Authentication**: JWT token-based authentication for secure login and session management.
-- **Styling**: CSS, Taildwindcss for custom styles and animations.
+- **Styling**: CSS, Tailwind CSS for custom styles and animations.
 - **Build and Deployment**: Vercel for hosting the live application.
-
 
 ## ⚙️ Backend Integration
 

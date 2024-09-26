@@ -4,7 +4,8 @@ import { RootState } from '../store';
 
 // Create a base query with token authentication
 const baseQuery = fetchBaseQuery({
-  baseUrl: 'https://car-sarvices-api.vercel.app/api/',
+  // baseUrl: 'https://car-service-api-three.vercel.app/api/',
+  baseUrl: 'http://localhost:5000/api/',
   prepareHeaders: (headers, { getState }) => {
     // Get the token from state, localStorage, or any other secure location
     const token = (getState() as RootState).auth.token; 

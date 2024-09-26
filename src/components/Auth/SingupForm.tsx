@@ -6,11 +6,21 @@ import { toast } from "sonner";
 import ILabel from "../Form/ILabel";
 import CInput from "../Form/CInput";
 import { useCreateUserMutation } from "../../redux/features/auth/authApi";
+import { z } from "zod";
 
 // Define the type for form errors
 interface FormErrors {
   [key: string]: string | undefined;
 }
+
+// Define your validation schema using Zod
+const createSignUpValidationSchema = z.object({
+  name: z.string().nonempty("Name is required"),
+  email: z.string().email("Invalid email format").nonempty("Email is required"),
+  password: z.string().min(6, "Password must contain at least 6 characters one upercase one lowarecase and use some characters also number"),
+  phone: z.string().nonempty("Phone is required"),
+  address: z.string().nonempty("Address is required"),
+});
 
 const SignupForm = () => {
   const [createUser, { isLoading }] = useCreateUserMutation();
@@ -21,8 +31,8 @@ const SignupForm = () => {
     password: "",
     phone: "",
     address: "",
-    // role: "USER",
   });
+
   // State to manage form field errors
   const [formErrors, setFormErrors] = useState<FormErrors>({});
 
@@ -35,18 +45,24 @@ const SignupForm = () => {
     e.preventDefault();
     setFormErrors({});
 
+    // Validate form data using Zod
     try {
+      createSignUpValidationSchema.parse(formData);
+
+      // If validation passes, proceed to create user
       await createUser(formData).unwrap();
-      toast.success('User created successfully!');
-      navigate('/auth/login');
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (err: any) {
-      // Update formErrors state with server-side validation errors
-      if (err?.data?.errors) {
-        // Example error structure: { errors: { fieldName: "error message" } }
-        setFormErrors(err.data.errors);
+      toast.success("User created successfully!");
+      navigate("/auth/login");
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        // Update formErrors state with validation errors from Zod
+        const errors: FormErrors = {};
+        err.errors.forEach((error) => {
+          errors[error.path[0]] = error.message; 
+        });
+        setFormErrors(errors);
       } else {
-        toast.error(`Failed to create user: ${err?.message || err}`);
+        toast.error(`Failed to create user: ${err}`);
       }
     }
   };
@@ -64,7 +80,7 @@ const SignupForm = () => {
               placeholder="Enter your name"
               value={formData.name}
               onChange={handleChange}
-              error={formErrors.name} // Pass the error message
+              error={formErrors.name} 
             />
           </div>
           <div className="flex flex-col">
@@ -86,7 +102,7 @@ const SignupForm = () => {
               placeholder="Enter your phone number"
               value={formData.phone}
               onChange={handleChange}
-              error={formErrors.phone} // Pass the error message
+              error={formErrors.phone}
             />
           </div>
           <div className="flex flex-col">
@@ -97,7 +113,7 @@ const SignupForm = () => {
               placeholder="Enter your password"
               value={formData.password}
               onChange={handleChange}
-              error={formErrors.password} // Pass the error message
+              error={formErrors.password} 
             />
           </div>
           <div className="flex flex-col">
@@ -108,7 +124,7 @@ const SignupForm = () => {
               placeholder="Enter your address"
               value={formData.address}
               onChange={handleChange}
-              error={formErrors.address} // Pass the error message
+              error={formErrors.address}
             />
           </div>
           <Button

@@ -57,7 +57,7 @@ const ServiceBooking: React.FC = () => {
         endTime: values.endTime || selectedBooking.endTime,
         duration: values.duration || selectedBooking.duration,
         price: selectedBooking.price,
-        date: selectedBooking.sloteDate, // Ensure this is correctly assigned
+        date: selectedBooking.sloteDate,
       },
       totalPrice: selectedBooking.price,
       userId: currentUser?._id,
@@ -67,15 +67,18 @@ const ServiceBooking: React.FC = () => {
 
     try {
       const paymentResponse = await makePayment(formData).unwrap();
+      console.log("paymentResponse", paymentResponse.data?.paymentSession?.payment_url);
       if (paymentResponse.success) {
-        window.location.href = paymentResponse.data.payment_url;
+        window.location.href = paymentResponse.data?.paymentSession?.payment_url;
+        toast.success("Redirecting to payment...");
+      } else {
+        toast.error("Payment initiation failed.");
       }
-      toast.success("Payment successful! Redirecting...");
     } catch (error: unknown) {
       const apiError = error as { data?: { message: string }; message: string };
-
-  // Display the error message
-  toast.error("Payment failed: " + (apiError.data?.message || apiError.message));
+      toast.error(
+        "Payment failed: " + (apiError.data?.message || apiError.message)
+      );
     }
   };
 
