@@ -1,14 +1,26 @@
-import { Table, Select, Space } from 'antd';
-import { useState } from 'react';
-import { useGetAllUsersQuery, useUserUpdateRoleMutation } from '../../../redux/features/auth/authApi';
+import { Table, Select, Space } from "antd";
+import { useState } from "react";
+import {
+  useGetAllUsersQuery,
+  useUserUpdateRoleMutation,
+} from "../../../redux/features/auth/authApi";
+import LoadingPage from "../../../pages/Loading/LoadingPage";
 
 const { Option } = Select;
 
 const UserManagement = () => {
-  const { data, refetch } = useGetAllUsersQuery(undefined); 
+  const { data, refetch, isLoading } = useGetAllUsersQuery(undefined);
   const [updateUserRole] = useUserUpdateRoleMutation();
-  const [selectedRole, setSelectedRole] = useState<{ [key: string]: string }>({});
-
+  const [selectedRole, setSelectedRole] = useState<{ [key: string]: string }>(
+    {}
+  );
+  if (isLoading) {
+    return (
+      <div>
+        <LoadingPage />
+      </div>
+    );
+  }
   // Handle role change for a specific user
   const handleRoleChange = async (userId: string, newRole: string) => {
     setSelectedRole((prev) => ({ ...prev, [userId]: newRole }));
@@ -16,41 +28,42 @@ const UserManagement = () => {
       await updateUserRole({ userId, role: newRole }).unwrap();
       refetch(); // Refetch user data after role update
     } catch (error) {
-      console.error('Failed to update role:', error);
+      console.error("Failed to update role:", error);
     }
   };
 
   const allUsers = data?.data || [];
+  console.log("All user", data?.data);
 
   const columns = [
     {
-      title: 'Name',
-      dataIndex: 'name',
-      key: 'name',
+      title: "Name",
+      dataIndex: "name",
+      key: "name",
     },
     {
-      title: 'Email',
-      dataIndex: 'email',
-      key: 'email',
+      title: "Email",
+      dataIndex: "email",
+      key: "email",
     },
     {
-      title: 'Role',
-      dataIndex: 'role',
-      key: 'role',
+      title: "Role",
+      dataIndex: "role",
+      key: "role",
       render: (role: string) => {
         // Conditionally set class based on the role
         const roleClass =
-          role === 'ADMIN'
-            ? 'border border-green-600 text-green-600'
-            : 'border border-blue-600 text-blue-600';
+          role === "ADMIN"
+            ? "border border-green-600 text-green-600"
+            : "border border-blue-600 text-blue-600";
         return (
           <span className={`px-3 py-1 rounded-lg ${roleClass}`}>{role}</span>
         );
       },
     },
     {
-      title: 'Actions',
-      key: 'actions',
+      title: "Actions",
+      key: "actions",
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       render: (_text: any, record: any) => (
         <Space>
@@ -61,7 +74,7 @@ const UserManagement = () => {
             onChange={(newRole) => handleRoleChange(record._id, newRole)}
           >
             {/* Show the opposite role in the dropdown */}
-            {record.role === 'USER' ? (
+            {record.role === "USER" ? (
               <Option value="ADMIN">Make Admin</Option>
             ) : (
               <Option value="USER">Make User</Option>
