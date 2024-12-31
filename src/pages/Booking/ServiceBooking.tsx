@@ -31,7 +31,13 @@ const ServiceBooking: React.FC = () => {
   // console.log("Selected Booking Date:", selectedBooking?.sloteDate);
 
   if (!selectedBooking) {
-    return <div>No booking found.</div>;
+    return (
+      <div className="flex items-center justify-center h-screen ">
+        <h1 className="text-2xl font-bold text-primary">
+          No booking found. Please select a service.
+        </h1>
+      </div>
+    );
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -67,9 +73,13 @@ const ServiceBooking: React.FC = () => {
 
     try {
       const paymentResponse = await makePayment(formData).unwrap();
-      console.log("paymentResponse", paymentResponse.data?.paymentSession?.payment_url);
+      console.log(
+        "paymentResponse",
+        paymentResponse.data?.paymentSession?.payment_url
+      );
       if (paymentResponse.success) {
-        window.location.href = paymentResponse.data?.paymentSession?.payment_url;
+        window.location.href =
+          paymentResponse.data?.paymentSession?.payment_url;
         toast.success("Redirecting to payment...");
       } else {
         toast.error("Payment initiation failed.");
