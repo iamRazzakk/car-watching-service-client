@@ -9,8 +9,10 @@ import {
   Form,
   Input,
   InputNumber,
+  Upload,
 } from "antd";
 import type { TableProps } from "antd";
+import { PlusOutlined } from "@ant-design/icons";
 import {
   useDeleteCarServiceMutation,
   useGetAllCarServicesQuery,
@@ -34,15 +36,15 @@ const DashboardServices: React.FC = () => {
   const [deleteCarService] = useDeleteCarServiceMutation();
   const [updateCarService] = useUpdateCarServiceMutation();
   const [createCarService] = useCreateCarServiceMutation();
-  
+
   const [createModalVisible, setCreateModalVisible] = useState(false); // Create modal state
   const [editModalVisible, setEditModalVisible] = useState(false); // Edit modal state
   const [currentRecord, setCurrentRecord] = useState<DataType | null>(null); // For editing service
-  
+
   const [createForm] = Form.useForm();
   const [editForm] = Form.useForm();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
+
   // Handle loading state
   if (isLoading) return <LoadingPage />;
 
@@ -193,10 +195,7 @@ const DashboardServices: React.FC = () => {
         All Services
       </h2>
       <div className="lg:flex items-end justify-end lg:mb-8 md:mb-6 mb-4">
-        <Button
-          type="primary"
-          onClick={() => setCreateModalVisible(true)}
-        >
+        <Button type="primary" onClick={() => setCreateModalVisible(true)}>
           Add New Service
         </Button>
       </div>
@@ -218,7 +217,9 @@ const DashboardServices: React.FC = () => {
           <Form.Item
             label="Name"
             name="name"
-            rules={[{ required: true, message: "Please enter the service name!" }]}
+            rules={[
+              { required: true, message: "Please enter the service name!" },
+            ]}
           >
             <Input />
           </Form.Item>
@@ -239,10 +240,23 @@ const DashboardServices: React.FC = () => {
           <Form.Item
             label="Description"
             name="description"
-            rules={[{ required: true, message: "Please enter the description!" }]}
+            rules={[
+              { required: true, message: "Please enter the description!" },
+            ]}
           >
             <Input.TextArea style={{ height: 120, resize: "none" }} />
           </Form.Item>
+          <Upload
+            className="lg:mb-6 md:mb-5 mb-4"
+            name="image"
+            listType="picture-card"
+            showUploadList={false}
+          >
+            <div>
+              <PlusOutlined />
+              <div style={{ marginTop: 8 }}>Upload</div>
+            </div>
+          </Upload>
           <Form.Item>
             <Button type="primary" htmlType="submit" loading={isSubmitting}>
               Create
@@ -262,7 +276,9 @@ const DashboardServices: React.FC = () => {
           <Form.Item
             label="Name"
             name="name"
-            rules={[{ required: true, message: "Please enter the service name!" }]}
+            rules={[
+              { required: true, message: "Please enter the service name!" },
+            ]}
           >
             <Input />
           </Form.Item>
@@ -283,7 +299,9 @@ const DashboardServices: React.FC = () => {
           <Form.Item
             label="Description"
             name="description"
-            rules={[{ required: true, message: "Please enter the description!" }]}
+            rules={[
+              { required: true, message: "Please enter the description!" },
+            ]}
           >
             <Input.TextArea style={{ height: 120, resize: "none" }} />
           </Form.Item>

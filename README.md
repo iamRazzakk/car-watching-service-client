@@ -23,20 +23,24 @@ Explore the live application here:
 ### Public Pages
 
 1. **Home Page**
+
    - Navigation Menu with links to essential pages.
    - Hero section highlighting branding and services.
    - Quick booking call-to-action.
    - Featured services and reviews section with ratings.
 
 2. **User Authentication**
+
    - Sign-up and login functionality with form validation.
    - Token-based authentication for secure user sessions.
 
 3. **Services Page**
+
    - List of all available car wash services.
    - Search, filter, and sort functionality to help users find the best service.
 
 4. **Service Details Page**
+
    - Detailed service descriptions with available time slots for booking.
    - Calendar to select dates and view available slots.
 
@@ -60,10 +64,11 @@ Explore the live application here:
 
 To access the Admin Dashboard, you can use the following credentials:
 
-- **Email**: admin@gmail.com
-- **Password**: Admin@123
+- **Email**: razzak@gmail.com
+- **Password**: Ctg..123
 
 ### Error Pages
+
 - Custom 404 error page with navigation options.
 
 ## 🖥️ Technologies Used
