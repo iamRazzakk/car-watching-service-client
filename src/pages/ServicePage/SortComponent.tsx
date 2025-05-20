@@ -11,7 +11,11 @@ const SortComponent = () => {
   };
 
   return (
-    <select value={sort} onChange={handleSortChange} className="border  p-3 rounded-md">
+    <select
+      value={sort}
+      onChange={handleSortChange}
+      className="border  p-3 rounded-md"
+    >
       <option value="new">Newest</option>
       <option value="old">Oldest</option>
       <option value="low-high">Price: Low to High</option>

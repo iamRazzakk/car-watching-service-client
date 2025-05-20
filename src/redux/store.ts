@@ -22,7 +22,6 @@ const persisBookingConfig = {
   key: "slotBookmarks",
   storage,
 };
-
 const persistAuthReducer = persistReducer(persisConfig, authReducer);
 const parsistSloteBooking = persistReducer(persisBookingConfig, bookingReducer);
 export const store = configureStore({

@@ -42,7 +42,7 @@ const ServiceDetailPage: React.FC = () => {
     const serviceBookingData = {
       serviceId: serviceList._id,
       slotId: slot._id,
-      image: slot.image,
+      image: slot?.image,
       sloteDate: slot.date,
       serviceName: serviceList.name,
       serviceImage: serviceList.image?.url || "",

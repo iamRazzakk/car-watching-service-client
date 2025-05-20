@@ -37,7 +37,7 @@ const FilterSearchComponent: React.FC = () => {
   };
 
   return (
-    <div className="filter-search-container">
+    <div className="filter-search-container ">
       <div className="lg:w-1/3 mx-auto ">
         <CInput
           type="text"
@@ -58,7 +58,7 @@ const FilterSearchComponent: React.FC = () => {
           }
           onChange={handleMinPriceChange}
         />
-        <ILabel  label="Max: " htmlFor="Max"></ILabel>
+        <ILabel label="Max: " htmlFor="Max"></ILabel>
         <CInput
           type="number"
           name="maxPrice"
@@ -69,6 +69,7 @@ const FilterSearchComponent: React.FC = () => {
           onChange={handleMaxPriceChange}
         />
         <SortComponent />
+
         <Button
           onClick={handleReset}
           className="reset-button"
