@@ -37,11 +37,12 @@ const ServiceDetailPage: React.FC = () => {
 
   // Handle Slot Selection and automatic booking
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const handleSlotSelect = async (slot:any) => {
+  const handleSlotSelect = async (slot: any) => {
     // console.log("Selected slot:", slot);
     const serviceBookingData = {
       serviceId: serviceList._id,
       slotId: slot._id,
+      image: slot.image,
       sloteDate: slot.date,
       serviceName: serviceList.name,
       serviceImage: serviceList.image?.url || "",
@@ -50,15 +51,15 @@ const ServiceDetailPage: React.FC = () => {
       startTime: slot.startTime,
       endTime: slot.endTime,
     };
-    
+
     // Dispatch the bookmark action
     dispatch(addBookmark(serviceBookingData));
-    
+
     // Prepare data for updating the slot status
     const updateData = {
       status: "booked",
     };
-  
+
     try {
       console.log("Updating slot ID:", slot._id);
       await updateSlotStatus({ slotId: slot._id, body: updateData }).unwrap();
@@ -70,10 +71,9 @@ const ServiceDetailPage: React.FC = () => {
     }
   };
 
-  useEffect(() => {
-    console.log("Selected Date:", selectedDate.format("YYYY-MM-DD"));
-    console.log("Slots Data:", sloteList); 
-  }, [sloteList, selectedDate]);
+  // useEffect(() => {
+  //   console.log("Selected Date:", selectedDate.format("YYYY-MM-DD"));
+  // }, [sloteList, selectedDate]);
 
   if (serviceLoading || slotsLoading) return <LoadingPage />;
 
@@ -83,11 +83,11 @@ const ServiceDetailPage: React.FC = () => {
       {serviceList ? (
         <div className="flex flex-col lg:flex-row bg-white shadow-lg rounded-lg overflow-hidden lg:mt-8 md:mt-4">
           {/* Image Section */}
-          <div className="w-full lg:w-1/2">
+          <div className="w-40 lg:w-1/2 lg:h-80 ">
             <img
-              src={serviceList?.image?.url}
+              src={serviceList?.image}
               alt={serviceList?.image?.altText || "Service Image"}
-              className="w-full h-80 object-cover"
+              className=" object-cover"
             />
           </div>
           {/* Details Section */}
@@ -131,12 +131,12 @@ const ServiceDetailPage: React.FC = () => {
                 <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
                   {sloteList
                     ?.filter(
-                      (slot:any) =>
-                        slot.service._id === serviceList._id &&
+                      (slot: any) =>
+                        slot.service?._id === serviceList?._id &&
                         slot.isBooked !== "booked" &&
-                        slot.date === selectedDate.format("YYYY-MM-DD") 
+                        slot.date === selectedDate.format("YYYY-MM-DD")
                     )
-                    .map((slot:any) => (
+                    .map((slot: any) => (
                       <button
                         key={slot._id}
                         onClick={() => handleSlotSelect(slot)}
@@ -147,8 +147,8 @@ const ServiceDetailPage: React.FC = () => {
                     ))}
                   {/* Message when no available slots */}
                   {sloteList?.filter(
-                    (slot:any) =>
-                      slot.service._id === serviceList._id &&
+                    (slot: any) =>
+                      slot.service?._id === serviceList?._id &&
                       slot.isBooked !== "booked" &&
                       slot.date === selectedDate.format("YYYY-MM-DD")
                   ).length === 0 && (

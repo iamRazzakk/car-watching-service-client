@@ -89,7 +89,7 @@ const HeroSection = () => {
                     category="secondary"
                     className="bg-white text-black"
                     onClick={() => {
-                      handleButtonClick("Secondary")
+                      handleButtonClick("Secondary");
                       navigate("/services");
                     }}
                   />

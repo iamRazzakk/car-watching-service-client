@@ -5,20 +5,20 @@ export type TSlotBookmark = {
   serviceId: string;
   slotId: string;
   serviceName: string;
-  serviceImage: string;
+  image: string;
   duration: number;
   price: number;
   startTime: string;
   endTime: string;
-  sloteDate?:Date
+  sloteDate?: Date;
 };
 
 type SlotBookmarkState = {
-  bookmark: TSlotBookmark | null; // Store a single bookmark
+  bookmark: TSlotBookmark | null;
 };
 
 const initialState: SlotBookmarkState = {
-  bookmark: null, // Initially, no bookmark is selected
+  bookmark: null,
 };
 
 const slotBookmarkSlice = createSlice({
@@ -26,13 +26,13 @@ const slotBookmarkSlice = createSlice({
   initialState,
   reducers: {
     addBookmark: (state, action: PayloadAction<TSlotBookmark>) => {
-      state.bookmark = action.payload; // Add a single bookmark
+      state.bookmark = action.payload;
     },
     removeBookmark: (state) => {
-      state.bookmark = null; // Clear the bookmark
+      state.bookmark = null;
     },
     clearBookmarks: (state) => {
-      state.bookmark = null; // Clear the bookmark
+      state.bookmark = null;
     },
   },
 });

@@ -33,9 +33,8 @@ const ServicePage = () => {
           className="text-3xl font-bold text-center"
         />
         <FilterSearchComponent />
-        
       </div>
-      <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-4 lg:p-8 p-4 min-h-screen">
+      <div className="grid lg:grid-cols-4 md:grid-cols-3 grid-cols-1 gap-4 lg:p-8 p-4 min-h-screen">
         {filteredServices?.map((service) => (
           <ServiceCardPage key={service._id} service={service} />
         ))}

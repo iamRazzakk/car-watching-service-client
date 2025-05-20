@@ -29,6 +29,7 @@ interface DataType {
   price: number;
   description: string;
   createdAt: string;
+  image?: string;
 }
 
 const DashboardServices: React.FC = () => {
@@ -37,18 +38,22 @@ const DashboardServices: React.FC = () => {
   const [updateCarService] = useUpdateCarServiceMutation();
   const [createCarService] = useCreateCarServiceMutation();
 
-  const [createModalVisible, setCreateModalVisible] = useState(false); // Create modal state
-  const [editModalVisible, setEditModalVisible] = useState(false); // Edit modal state
-  const [currentRecord, setCurrentRecord] = useState<DataType | null>(null); // For editing service
+  // Create modal image file
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  // Edit modal image file and existing image url
+  const [editImageFile, setEditImageFile] = useState<File | null>(null);
+  const [existingImageUrl, setExistingImageUrl] = useState<string>("");
+
+  const [createModalVisible, setCreateModalVisible] = useState(false);
+  const [editModalVisible, setEditModalVisible] = useState(false);
+  const [currentRecord, setCurrentRecord] = useState<DataType | null>(null);
 
   const [createForm] = Form.useForm();
   const [editForm] = Form.useForm();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Handle loading state
   if (isLoading) return <LoadingPage />;
 
-  // Handle delete action
   const handleDelete = async (id: string) => {
     Modal.confirm({
       title: "Are you sure you want to delete this service?",
@@ -69,9 +74,10 @@ const DashboardServices: React.FC = () => {
     });
   };
 
-  // Handle edit action
   const handleEdit = (record: DataType) => {
     setCurrentRecord(record);
+    setExistingImageUrl(record.image || "");
+    setEditImageFile(null);
     editForm.setFieldsValue({
       name: record.name,
       duration: record.duration,
@@ -81,15 +87,85 @@ const DashboardServices: React.FC = () => {
     setEditModalVisible(true);
   };
 
-  // Handle form submission for update
+  // ImgBB upload helper function
+  const uploadToImgBB = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = async () => {
+        try {
+          const base64data = (reader.result as string).split(",")[1];
+          const formData = new FormData();
+          formData.append("key", "4de15ac53abd01fd9836fb7fce960655"); // Your ImgBB API key
+          formData.append("image", base64data);
+
+          const res = await fetch("https://api.imgbb.com/1/upload", {
+            method: "POST",
+            body: formData,
+          });
+
+          const data = await res.json();
+          if (data.success) {
+            resolve(data.data.url);
+          } else {
+            reject(new Error("ImgBB upload failed"));
+          }
+        } catch (err) {
+          reject(err);
+        }
+      };
+      reader.onerror = () => reject(new Error("Failed to read file"));
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const handleCreateSubmit = async (values: any) => {
+    try {
+      if (!imageFile) {
+        toast.error("Please upload an image.");
+        return;
+      }
+
+      setIsSubmitting(true);
+
+      const imageUrl = await uploadToImgBB(imageFile);
+
+      await createCarService({ ...values, image: imageUrl }).unwrap();
+
+      toast.success("Service created successfully");
+      setCreateModalVisible(false);
+      createForm.resetFields();
+      setImageFile(null);
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to create service";
+      toast.error(errorMessage);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   const handleUpdateSubmit = async (values: any) => {
     if (currentRecord) {
       try {
         setIsSubmitting(true);
-        await updateCarService({ id: currentRecord.key, ...values }).unwrap();
+
+        let imageUrl = existingImageUrl;
+
+        if (editImageFile) {
+          imageUrl = await uploadToImgBB(editImageFile);
+        }
+
+        await updateCarService({
+          id: currentRecord.key,
+          ...values,
+          image: imageUrl,
+        }).unwrap();
+
         toast.success("Service updated successfully");
         setEditModalVisible(false);
         editForm.resetFields();
+        setEditImageFile(null);
+        setExistingImageUrl("");
       } catch (error) {
         const errorMessage =
           error instanceof Error ? error.message : "Failed to update service";
@@ -100,24 +176,6 @@ const DashboardServices: React.FC = () => {
     }
   };
 
-  // Handle form submission for create
-  const handleCreateSubmit = async (values: any) => {
-    try {
-      setIsSubmitting(true);
-      await createCarService(values).unwrap();
-      toast.success("Service created successfully");
-      setCreateModalVisible(false);
-      createForm.resetFields();
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Failed to create service";
-      toast.error(errorMessage);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  // Define table columns
   const columns: TableProps<DataType>["columns"] = [
     {
       title: "Name",
@@ -176,7 +234,6 @@ const DashboardServices: React.FC = () => {
     },
   ];
 
-  // Transform fetched data to fit DataType format
   const myData: DataType[] =
     data?.data
       .filter((item: any) => !item.isDeleted)
@@ -187,6 +244,7 @@ const DashboardServices: React.FC = () => {
         price: item.price,
         description: item.description,
         createdAt: item.createdAt,
+        image: item.image,
       })) || [];
 
   return (
@@ -246,17 +304,34 @@ const DashboardServices: React.FC = () => {
           >
             <Input.TextArea style={{ height: 120, resize: "none" }} />
           </Form.Item>
-          <Upload
-            className="lg:mb-6 md:mb-5 mb-4"
-            name="image"
-            listType="picture-card"
-            showUploadList={false}
+          <Form.Item
+            label="Image"
+            required
+            rules={[
+              {
+                validator: () =>
+                  imageFile
+                    ? Promise.resolve()
+                    : Promise.reject("Please upload an image"),
+              },
+            ]}
           >
-            <div>
-              <PlusOutlined />
-              <div style={{ marginTop: 8 }}>Upload</div>
-            </div>
-          </Upload>
+            <Upload
+              name="image"
+              listType="picture-card"
+              showUploadList={false}
+              beforeUpload={(file) => {
+                setImageFile(file);
+                return false;
+              }}
+            >
+              <div>
+                <PlusOutlined />
+                <div style={{ marginTop: 8 }}>Upload</div>
+              </div>
+            </Upload>
+          </Form.Item>
+
           <Form.Item>
             <Button type="primary" htmlType="submit" loading={isSubmitting}>
               Create
@@ -305,6 +380,37 @@ const DashboardServices: React.FC = () => {
           >
             <Input.TextArea style={{ height: 120, resize: "none" }} />
           </Form.Item>
+
+          <Form.Item label="Image">
+            <Upload
+              listType="picture-card"
+              showUploadList={false}
+              beforeUpload={(file) => {
+                setEditImageFile(file);
+                return false;
+              }}
+            >
+              {editImageFile ? (
+                <img
+                  src={URL.createObjectURL(editImageFile)}
+                  alt="new"
+                  style={{ width: "100%" }}
+                />
+              ) : existingImageUrl ? (
+                <img
+                  src={existingImageUrl}
+                  alt="current"
+                  style={{ width: "100%" }}
+                />
+              ) : (
+                <div>
+                  <PlusOutlined />
+                  <div style={{ marginTop: 8 }}>Upload</div>
+                </div>
+              )}
+            </Upload>
+          </Form.Item>
+
           <Form.Item>
             <Button type="primary" htmlType="submit" loading={isSubmitting}>
               Update

@@ -101,14 +101,13 @@ const ServiceBooking: React.FC = () => {
           <Card
             cover={
               <img
-                src={selectedBooking.serviceImage}
-                alt={selectedBooking.serviceName}
+                alt={selectedBooking.image}
                 style={{ objectFit: "cover", height: 300 }}
               />
             }
           >
             <Card.Meta
-              title={selectedBooking.serviceName}
+              title={selectedBooking.image}
               description={
                 <>
                   <div className="flex items-center">

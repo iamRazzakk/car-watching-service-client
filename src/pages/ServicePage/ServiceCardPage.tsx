@@ -15,7 +15,7 @@ const ServiceCardPage = ({ service }: { service: TCreateService }) => {
       {/* If the service or image is still loading, display skeleton */}
       {service ? (
         <img
-          src=""
+          src={service?.image}
           alt="Service Image"
           className="w-full h-48 object-cover rounded-t-lg"
         />
