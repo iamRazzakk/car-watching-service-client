@@ -20,7 +20,6 @@ type SlotBookmarkState = {
 const initialState: SlotBookmarkState = {
   bookmark: null,
 };
-
 const slotBookmarkSlice = createSlice({
   name: "slotBookmarks",
   initialState,

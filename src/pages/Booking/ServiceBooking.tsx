@@ -24,10 +24,13 @@ export const vehicleTypeArray = [
 const ServiceBooking: React.FC = () => {
   const myBooking = useAppSelector(getSlotBookmark);
   const currentUser = useAppSelector(useCurrentUser);
+  console.log("currentUser", currentUser);
   const [makePayment, { isLoading }] = useMakePaymentMutation();
   const [form] = Form.useForm();
   // console.log(myBooking);
   const selectedBooking = myBooking;
+  console.log("Selected booking image URL:", selectedBooking?.image);
+
   // console.log("Selected Booking Date:", selectedBooking?.sloteDate);
 
   if (!selectedBooking) {
@@ -101,7 +104,7 @@ const ServiceBooking: React.FC = () => {
           <Card
             cover={
               <img
-                alt={selectedBooking.image}
+                alt={selectedBooking?.image}
                 style={{ objectFit: "cover", height: 300 }}
               />
             }

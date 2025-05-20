@@ -71,7 +71,7 @@ const applyFilters = (state: ServicesState): TCreateService[] => {
 
   // Sort services
   if (state.sort === "new") {
-    filtered.sort((a, b) => (a._id > b._id ? -1 : 1)); // Assuming `_id` represents time of creation
+    filtered.sort((a, b) => (a._id > b._id ? -1 : 1));
   } else if (state.sort === "old") {
     filtered.sort((a, b) => (a._id > b._id ? 1 : -1));
   } else if (state.sort === "low-high") {
